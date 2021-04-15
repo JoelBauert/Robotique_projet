@@ -17,6 +17,18 @@ typedef enum {
 	BACK_OUTPUT
 } BUFFER_NAME_t;
 
+//éventuellement le mettre dans un fichier à part
+typedef struct
+{
+	float K;
+	float integral;
+	float derivate;
+} PID_obj;
+
+//dans pi_processor.h max= #define MAX_SUM_ERROR 			(MOTOR_SPEED_LIMIT/KI)
+PID_obj calcul_pid(float val1, float val2, float threshold, float max);
+
+void find_sound(float micro0, float micro1, float micro2);
 
 void processAudioData(int16_t *data, uint16_t num_samples);
 
