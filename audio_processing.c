@@ -195,8 +195,8 @@ void processAudioData(int16_t *data, uint16_t num_samples){
 		nb_samples = 0;
 		mustSend++;
 
-		micro0 = sound_remote(micLeft_output);
-		micro1 = sound_remote(micRight_output);
+		micro0 = sound_remote(micRight_output);
+		micro1 = sound_remote(micLeft_output);
 		micro2 = sound_remote(micBack_output); //lui je ne suis pas sure...
 
 		find_sound(micro0, micro1, micro2);
