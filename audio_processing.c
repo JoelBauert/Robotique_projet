@@ -25,7 +25,7 @@ static float micRight_output[FFT_SIZE];
 static float micFront_output[FFT_SIZE];
 static float micBack_output[FFT_SIZE];
 
-#define MIN_VALUE_THRESHOLD	10000 
+#define MIN_VALUE_THRESHOLD	10000
 
 #define MIN_FREQ		10	//we don't analyze before this index to not use resources for nothing
 #define FREQ_FORWARD	16	//250Hz
@@ -48,9 +48,35 @@ static float micBack_output[FFT_SIZE];
 *	Simple function used to detect the highest value in a buffer
 *	and to execute a motor command depending on it
 */
-void sound_remote(float* data){
+
+PID_obj calcul_pid(float val1, float val2, float threshold, float max)
+{
+	PID_obj pid;
+	static float integral = 0;
+	static float previous_error = 0;
+
+	float error = val2-val1;
+
+	if(fabs(error) <= threshold)
+		return pid;
+	pid.K = error;
+
+	integral += error;
+	if(integral > max){
+		integral = max;
+	}else if(integral < -max){
+		integral = -max;
+	}
+	pid.integral = integral;
+
+	pid.derivate = error-previous_error;
+
+	return pid;
+}
+
+float sound_remote(float* data){
 	float max_norm = MIN_VALUE_THRESHOLD;
-	int16_t max_norm_index = -1; 
+	int16_t max_norm_index = -1;
 
 	//search for the highest peak
 	for(uint16_t i = MIN_FREQ ; i <= MAX_FREQ ; i++){
@@ -59,38 +85,40 @@ void sound_remote(float* data){
 			max_norm_index = i;
 		}
 	}
-
-	//go forward
-	if(max_norm_index >= FREQ_FORWARD_L && max_norm_index <= FREQ_FORWARD_H){
-		left_motor_set_speed(600);
-		right_motor_set_speed(600);
-	}
-	//turn left
-	else if(max_norm_index >= FREQ_LEFT_L && max_norm_index <= FREQ_LEFT_H){
-		left_motor_set_speed(-600);
-		right_motor_set_speed(600);
-	}
-	//turn right
-	else if(max_norm_index >= FREQ_RIGHT_L && max_norm_index <= FREQ_RIGHT_H){
-		left_motor_set_speed(600);
-		right_motor_set_speed(-600);
-	}
-	//go backward
-	else if(max_norm_index >= FREQ_BACKWARD_L && max_norm_index <= FREQ_BACKWARD_H){
-		left_motor_set_speed(-600);
-		right_motor_set_speed(-600);
-	}
-	else{
-		left_motor_set_speed(0);
-		right_motor_set_speed(0);
-	}
-	
+	return max_norm;
 }
 
+void find_sound(float micro0, float micro1, float micro2)
+{
+	if(micro2 > micro1 && micro2 > micro0 && micro0 > micro1){
+		// turn right
+		left_motor_set_speed(600);
+		right_motor_set_speed(-600);
+		return;
+	}
+	if(micro2 > micro1 && micro2 > micro0 && micro1 > micro0){
+		// turn left
+		left_motor_set_speed(-600);
+		right_motor_set_speed(600);
+		return;
+	}
+
+	float speed = 0;
+	PID_obj pid;
+	if(micro1 > micro2 && micro0 > micro2 && micro1 > micro0){
+		// if micro1 > micro0 -> error = micro1-micro0 > 0 -> turn left
+		// if micro1 < micro0 -> error = micro1-micro0 < 0 -> turn right
+
+		pid = calcul_pid(micro1, micro0, 1000, MOTOR_SPEED_LIMIT/3.5f);
+		speed = 800.0f*pid.K + 0*pid.integral + 0*pid.derivate; //3.5f
+		left_motor_set_speed(-speed);
+		right_motor_set_speed(speed);
+	}
+}
 /*
 *	Callback called when the demodulation of the four microphones is done.
 *	We get 160 samples per mic every 10ms (16kHz)
-*	
+*
 *	params :
 *	int16_t *data			Buffer containing 4 times 160 samples. the samples are sorted by micro
 *							so we have [micRight1, micLeft1, micBack1, micFront1, micRight2, etc...]
@@ -133,6 +161,7 @@ void processAudioData(int16_t *data, uint16_t num_samples){
 	}
 
 	if(nb_samples >= (2 * FFT_SIZE)){
+		float micro0, micro1, micro2;
 		/*	FFT proccessing
 		*
 		*	This FFT function stores the results in the input buffer given.
@@ -166,7 +195,11 @@ void processAudioData(int16_t *data, uint16_t num_samples){
 		nb_samples = 0;
 		mustSend++;
 
-		sound_remote(micLeft_output);
+		micro0 = sound_remote(micRight_output);
+		micro1 = sound_remote(micLeft_output);
+		micro2 = sound_remote(micBack_output); //lui je ne suis pas sure...
+
+		find_sound(micro0, micro1, micro2);
 	}
 }
 
