@@ -108,10 +108,12 @@ float sound_remote(float* data){
 	return max_norm;
 }
 
+//led2 front_right, led4 back_right, led6 back left, led8 front_left
 void find_sound(float micro0, float micro1, float micro2)
 {
 	if(micro2 > micro1 && micro2 > micro0 && micro0 > micro1){ // back right
 		// turn right
+		toggle_rgb_led(LED4, GREEN_LED, 255);
 		speed_L = MOTOR_SPEED_LIMIT;
 		speed_R = -MOTOR_SPEED_LIMIT;
 		state = BACK_RIGHT;
@@ -119,6 +121,7 @@ void find_sound(float micro0, float micro1, float micro2)
 	}
 	if(micro2 > micro1 && micro2 > micro0 && micro1 > micro0){ // back left
 		// turn left
+		toggle_rgb_led(LED6, RED_LED, 255);
 		speed_L = -MOTOR_SPEED_LIMIT;
 		speed_R = MOTOR_SPEED_LIMIT;
 		state = BACK_LEFT;
@@ -130,7 +133,16 @@ void find_sound(float micro0, float micro1, float micro2)
 	if(micro1 > micro2 && micro0 > micro2){ // front right or left
 		// if micro1 > micro0 -> error = micro1-micro0 > 0 -> turn left
 		// if micro1 < micro0 -> error = micro1-micro0 < 0 -> turn right
-
+		if(micro1 > micro0)
+		{
+			toggle_rgb_led(LED2, RED_LED, 255);
+			toggle_rgb_led(LED2, GREEN_LED, 255);
+		}
+		else
+		{
+			toggle_rgb_led(LED8, RED_LED, 255);
+			toggle_rgb_led(LED8, BLUE_LED, 255);
+		}
 		pid = calcul_pid(micro1, micro0, THRESHOLD, MOTOR_SPEED_LIMIT);
 		speed = Kp*pid.error + Ki*pid.integral + Kd*pid.derivate;
 		speed_L = 550-speed;
@@ -148,7 +160,7 @@ void find_sound(float micro0, float micro1, float micro2)
 *	uint16_t num_samples	Tells how many data we get in total (should always be 640)
 */
 
-//led2 back_right,
+//led2 front_right, led4 back_right, led6 back left, led8 front_left
 void processAudioData(int16_t *data, uint16_t num_samples){
 
 	/*
