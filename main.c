@@ -24,6 +24,9 @@
 //uncomment to use double buffering to send the FFT to the computer
 #define DOUBLE_BUFFERING
 
+//
+//#define FIND_SOUND
+
 messagebus_t bus;
 MUTEX_DECL(bus_lock);
 CONDVAR_DECL(bus_condvar);
@@ -103,6 +106,9 @@ int main(void)
 #else
         SendFloatToComputer((BaseSequentialStream *) &SD3, get_audio_buffer_ptr(LEFT_OUTPUT), FFT_SIZE);
 #endif  /* DOUBLE_BUFFERING */
+#ifdef FIND_SOUND
+
+#endif
 #else
         //time measurement variables
         volatile uint16_t time_fft = 0;
