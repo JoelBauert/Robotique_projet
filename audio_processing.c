@@ -44,7 +44,7 @@ static float micBack_output[FFT_SIZE];
 #define FREQ_BACKWARD_H		(FREQ_BACKWARD+1)
 
 #define Kp				1
-#define Ki				0.00000001
+#define Ki				0
 #define Kd				0
 #define THRESHOLD		10000
 
@@ -116,8 +116,8 @@ void find_sound(float micro0, float micro1, float micro2)
 		// if micro1 > micro0 -> error = micro1-micro0 > 0 -> turn left
 		// if micro1 < micro0 -> error = micro1-micro0 < 0 -> turn right
 
-		pid = calcul_pid(micro1, micro0, THRESHOLD, MOTOR_SPEED_LIMIT/Ki);
-		speed = Kp*pid.error + 0*pid.integral + Kd*pid.derivate;
+		pid = calcul_pid(micro1, micro0, THRESHOLD, MOTOR_SPEED_LIMIT);
+		speed = Kp*pid.error + Ki*pid.integral + Kd*pid.derivate;
 		left_motor_set_speed(550-speed);
 		right_motor_set_speed(550+speed);
 	}
