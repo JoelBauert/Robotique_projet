@@ -19,7 +19,7 @@
 #include <arm_math.h>
 
 //uncomment to send the FFTs results from the real microphones
-#define SEND_FROM_MIC
+//#define SEND_FROM_MIC
 
 //uncomment to use double buffering to send the FFT to the computer
 #define DOUBLE_BUFFERING
@@ -75,6 +75,8 @@ int main(void)
     messagebus_init(&bus, &bus_lock, &bus_condvar);
     //init proximity sensors
     proximity_start();
+    //
+    distance_start();
 
     //temp tab used to store values in complex_float format
     //needed bx doFFT_c
