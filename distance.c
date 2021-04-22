@@ -1,3 +1,4 @@
+#include <main.h>
 #include <distance.h>
 #include <sensors/proximity.h>
 #include <motors.h>
@@ -6,11 +7,16 @@
 #include <usbcfg.h>
 #include <chprintf.h>
 
+static uint8_t stop;
+
+uint8_t get_stop(void)
+{
+	return stop;
+}
+
 static THD_WORKING_AREA(distance_thd_wa, 256);
 static THD_FUNCTION(distance_thd, arg)
 {
-	left_motor_set_speed(300);
-	right_motor_set_speed(300);
 	while(1)
 	{
 	find_distance();
@@ -32,17 +38,15 @@ void find_distance(void)
 	d_FL_17 = get_prox(FL_17);
 	d_FL_49 = get_prox(FL_49);
 
-	chprintf((BaseSequentialStream *)&SD3, "d_FR_17=%d, d_FR_49=%d, d_FL_17=%d, d_FL_49=%d\n", d_FR_17, d_FR_49, d_FL_17, d_FL_49);
+//	chprintf((BaseSequentialStream *)&SD3, "d_FR_17=%d, d_FR_49=%d, d_FL_17=%d, d_FL_49=%d\n", d_FR_17, d_FR_49, d_FL_17, d_FL_49);
 
 	if(d_FR_17>=THRESHOLD_DIST || d_FR_49>=THRESHOLD_DIST || d_FL_17>=THRESHOLD_DIST || d_FL_49>=THRESHOLD_DIST)
 	{
-		left_motor_set_speed(0);
-		right_motor_set_speed(0);
+		stop = true;
 	}
 	else
 	{
-		left_motor_set_speed(300);
-		right_motor_set_speed(300);
+		stop = false;
 	}
 
 }

@@ -3,6 +3,9 @@
 
 
 #define FFT_SIZE 	1024
+#define FRONT			0
+#define BACK_RIGHT		1
+#define BACK_LEFT		2
 
 typedef enum {
 	//2 times FFT_SIZE because these arrays contain complex numbers (real + imaginary)
@@ -24,6 +27,10 @@ typedef struct
 	float integral;
 	float derivate;
 } PID_obj;
+
+float get_speed_right(void);
+float get_speed_left(void);
+uint8_t get_state(void);
 
 //dans pi_processor.h max= #define MAX_SUM_ERROR 			(MOTOR_SPEED_LIMIT/KI)
 PID_obj calcul_pid(float val1, float val2, float threshold, float max);

@@ -18,14 +18,14 @@
 #include <communications.h>
 #include <arm_math.h>
 
-//uncomment to send the FFTs results from the real microphones
-//#define SEND_FROM_MIC
+//uncomment to use the microphones
+#define USE_MIC
 
 //uncomment to use double buffering to send the FFT to the computer
 #define DOUBLE_BUFFERING
 
-//
-//#define FIND_SOUND
+//uncomment to send the mic data to the computer
+//#define SEND_TO_COMPUTER
 
 messagebus_t bus;
 MUTEX_DECL(bus_lock);
@@ -78,7 +78,7 @@ int main(void)
     messagebus_init(&bus, &bus_lock, &bus_condvar);
     //init proximity sensors
     proximity_start();
-    //
+    //start distance measurement
     distance_start();
 
     //temp tab used to store values in complex_float format
@@ -88,27 +88,39 @@ int main(void)
     //to avoid modifications of the buffer while sending it
     static float send_tab[FFT_SIZE];
 
-#ifdef SEND_FROM_MIC
+#ifdef USE_MIC
     //starts the microphones processing thread.
     //it calls the callback given in parameter when samples are ready
     mic_start(&processAudioData);
-#endif  /* SEND_FROM_MIC */
+#endif  /* USE_MIC */
 
     /* Infinite loop. */
     while (1) {
-#ifdef SEND_FROM_MIC
+#ifdef USE_MIC
+#ifdef SEND_TO_COMPUTER
         //waits until a result must be sent to the computer
         wait_send_to_computer();
+#endif /* SEND_TO_COMPUTER */
+        // commande des moteurs
+        int state = get_state();
+        if(get_stop() && state == FRONT){
+			left_motor_set_speed(0);
+			right_motor_set_speed(0);
+        }
+        else{
+        	left_motor_set_speed(get_speed_left());
+        	right_motor_set_speed(get_speed_right());
+        }
+
 #ifdef DOUBLE_BUFFERING
         //we copy the buffer to avoid conflicts
         arm_copy_f32(get_audio_buffer_ptr(LEFT_OUTPUT), send_tab, FFT_SIZE);
+#ifdef SEND_TO_COMPUTER
         SendFloatToComputer((BaseSequentialStream *) &SD3, send_tab, FFT_SIZE);
+#endif /* SEND_TO_COMPUTER */
 #else
         SendFloatToComputer((BaseSequentialStream *) &SD3, get_audio_buffer_ptr(LEFT_OUTPUT), FFT_SIZE);
 #endif  /* DOUBLE_BUFFERING */
-#ifdef FIND_SOUND
-
-#endif
 #else
         //time measurement variables
         volatile uint16_t time_fft = 0;
@@ -180,7 +192,7 @@ int main(void)
             //chprintf((BaseSequentialStream *) &SDU1, "time fft = %d us, time magnitude = %d us\n",time_fft, time_mag);
 
         }
-#endif  /* SEND_FROM_MIC */
+#endif  /* USE_MIC */
     }
 }
 

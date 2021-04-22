@@ -48,10 +48,22 @@ static float micBack_output[FFT_SIZE];
 #define Kd				0
 #define THRESHOLD		10000
 
-/*
-*	Simple function used to detect the highest value in a buffer
-*	and to execute a motor command depending on it
-*/
+static float speed_R;
+static float speed_L;
+static uint8_t state;
+
+float get_speed_right(void)
+{
+	return speed_R;
+}
+float get_speed_left(void)
+{
+	return speed_L;
+}
+uint8_t get_state(void)
+{
+	return state;
+}
 
 PID_obj calcul_pid(float val1, float val2, float threshold, float max)
 {
@@ -99,14 +111,16 @@ void find_sound(float micro0, float micro1, float micro2)
 {
 	if(micro2 > micro1 && micro2 > micro0 && micro0 > micro1){ // back right
 		// turn right
-		left_motor_set_speed(MOTOR_SPEED_LIMIT);
-		right_motor_set_speed(-MOTOR_SPEED_LIMIT);
+		speed_L = MOTOR_SPEED_LIMIT;
+		speed_R = -MOTOR_SPEED_LIMIT;
+		state = BACK_RIGHT;
 		return;
 	}
 	if(micro2 > micro1 && micro2 > micro0 && micro1 > micro0){ // back left
 		// turn left
-		left_motor_set_speed(-MOTOR_SPEED_LIMIT);
-		right_motor_set_speed(MOTOR_SPEED_LIMIT);
+		speed_L = -MOTOR_SPEED_LIMIT;
+		speed_R = MOTOR_SPEED_LIMIT;
+		state = BACK_LEFT;
 		return;
 	}
 
@@ -118,8 +132,9 @@ void find_sound(float micro0, float micro1, float micro2)
 
 		pid = calcul_pid(micro1, micro0, THRESHOLD, MOTOR_SPEED_LIMIT);
 		speed = Kp*pid.error + Ki*pid.integral + Kd*pid.derivate;
-		left_motor_set_speed(550-speed);
-		right_motor_set_speed(550+speed);
+		speed_L = 550-speed;
+		speed_R = 550+speed;
+		state = FRONT;
 	}
 }
 /*
@@ -196,7 +211,7 @@ void processAudioData(int16_t *data, uint16_t num_samples){
 		//sends to UART3
 		if(mustSend > 8){
 			//signals to send the result to the computer
-			//chBSemSignal(&sendToComputer_sem);
+			chBSemSignal(&sendToComputer_sem);
 			mustSend = 0;
 		}
 		nb_samples = 0;
