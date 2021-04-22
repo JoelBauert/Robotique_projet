@@ -20,7 +20,7 @@ typedef enum {
 //éventuellement le mettre dans un fichier à part
 typedef struct
 {
-	float K;
+	float error;
 	float integral;
 	float derivate;
 } PID_obj;

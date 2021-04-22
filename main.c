@@ -10,17 +10,23 @@
 #include <chprintf.h>
 #include <motors.h>
 #include <audio/microphone.h>
+#include <sensors/proximity.h>
 
 #include <audio_processing.h>
 #include <fft.h>
+#include <distance.h>
 #include <communications.h>
 #include <arm_math.h>
 
 //uncomment to send the FFTs results from the real microphones
-//#define SEND_FROM_MIC
+#define SEND_FROM_MIC
 
 //uncomment to use double buffering to send the FFT to the computer
 #define DOUBLE_BUFFERING
+
+messagebus_t bus;
+MUTEX_DECL(bus_lock);
+CONDVAR_DECL(bus_condvar);
 
 static void serial_start(void)
 {
@@ -65,6 +71,10 @@ int main(void)
     timer12_start();
     //inits the motors
     motors_init();
+    // init message bus
+    messagebus_init(&bus, &bus_lock, &bus_condvar);
+    //init proximity sensors
+    proximity_start();
 
     //temp tab used to store values in complex_float format
     //needed bx doFFT_c

@@ -33,7 +33,6 @@ static float micBack_output[FFT_SIZE];
 #define FREQ_RIGHT		23	//359HZ
 #define FREQ_BACKWARD	26	//406Hz
 #define MAX_FREQ		30	//we don't analyze after this index to not use resources for nothing
-#define Jessica			1
 
 #define FREQ_FORWARD_L		(FREQ_FORWARD-1)
 #define FREQ_FORWARD_H		(FREQ_FORWARD+1)
@@ -43,6 +42,11 @@ static float micBack_output[FFT_SIZE];
 #define FREQ_RIGHT_H		(FREQ_RIGHT+1)
 #define FREQ_BACKWARD_L		(FREQ_BACKWARD-1)
 #define FREQ_BACKWARD_H		(FREQ_BACKWARD+1)
+
+#define Kp				1
+#define Ki				0.00000001
+#define Kd				0
+#define THRESHOLD		10000
 
 /*
 *	Simple function used to detect the highest value in a buffer
@@ -55,11 +59,14 @@ PID_obj calcul_pid(float val1, float val2, float threshold, float max)
 	static float integral = 0;
 	static float previous_error = 0;
 
-	float error = val2-val1;
+	float error = val1-val2;
 
 	if(fabs(error) <= threshold)
+	{
+		integral = 0;
 		return pid;
-	pid.K = error;
+	}
+	pid.error = error;
 
 	integral += error;
 	if(integral > max){
@@ -90,29 +97,29 @@ float sound_remote(float* data){
 
 void find_sound(float micro0, float micro1, float micro2)
 {
-	if(micro2 > micro1 && micro2 > micro0 && micro0 > micro1){
+	if(micro2 > micro1 && micro2 > micro0 && micro0 > micro1){ // back right
 		// turn right
-		left_motor_set_speed(600);
-		right_motor_set_speed(-600);
+		left_motor_set_speed(MOTOR_SPEED_LIMIT);
+		right_motor_set_speed(-MOTOR_SPEED_LIMIT);
 		return;
 	}
-	if(micro2 > micro1 && micro2 > micro0 && micro1 > micro0){
+	if(micro2 > micro1 && micro2 > micro0 && micro1 > micro0){ // back left
 		// turn left
-		left_motor_set_speed(-600);
-		right_motor_set_speed(600);
+		left_motor_set_speed(-MOTOR_SPEED_LIMIT);
+		right_motor_set_speed(MOTOR_SPEED_LIMIT);
 		return;
 	}
 
 	float speed = 0;
 	PID_obj pid;
-	if(micro1 > micro2 && micro0 > micro2 && micro1 > micro0){
+	if(micro1 > micro2 && micro0 > micro2){ // front right or left
 		// if micro1 > micro0 -> error = micro1-micro0 > 0 -> turn left
 		// if micro1 < micro0 -> error = micro1-micro0 < 0 -> turn right
 
-		pid = calcul_pid(micro1, micro0, 1000, MOTOR_SPEED_LIMIT/3.5f);
-		speed = 800.0f*pid.K + 0*pid.integral + 0*pid.derivate; //3.5f
-		left_motor_set_speed(-speed);
-		right_motor_set_speed(speed);
+		pid = calcul_pid(micro1, micro0, THRESHOLD, MOTOR_SPEED_LIMIT/Ki);
+		speed = Kp*pid.error + 0*pid.integral + Kd*pid.derivate;
+		left_motor_set_speed(550-speed);
+		right_motor_set_speed(550+speed);
 	}
 }
 /*
@@ -189,7 +196,7 @@ void processAudioData(int16_t *data, uint16_t num_samples){
 		//sends to UART3
 		if(mustSend > 8){
 			//signals to send the result to the computer
-			chBSemSignal(&sendToComputer_sem);
+			//chBSemSignal(&sendToComputer_sem);
 			mustSend = 0;
 		}
 		nb_samples = 0;
@@ -197,7 +204,7 @@ void processAudioData(int16_t *data, uint16_t num_samples){
 
 		micro0 = sound_remote(micRight_output);
 		micro1 = sound_remote(micLeft_output);
-		micro2 = sound_remote(micBack_output); //lui je ne suis pas sure...
+		micro2 = sound_remote(micBack_output);
 
 		find_sound(micro0, micro1, micro2);
 	}
