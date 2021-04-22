@@ -5,7 +5,6 @@
 #include <chprintf.h>
 
 #include <motors.h>
-#include <leds.h>
 #include <audio/microphone.h>
 #include <audio_processing.h>
 #include <communications.h>
@@ -113,7 +112,6 @@ void find_sound(float micro0, float micro1, float micro2)
 {
 	if(micro2 > micro1 && micro2 > micro0 && micro0 > micro1){ // back right
 		// turn right
-		toggle_rgb_led(LED4, GREEN_LED, 255);
 		speed_L = MOTOR_SPEED_LIMIT;
 		speed_R = -MOTOR_SPEED_LIMIT;
 		state = BACK_RIGHT;
@@ -121,7 +119,6 @@ void find_sound(float micro0, float micro1, float micro2)
 	}
 	if(micro2 > micro1 && micro2 > micro0 && micro1 > micro0){ // back left
 		// turn left
-		toggle_rgb_led(LED6, RED_LED, 255);
 		speed_L = -MOTOR_SPEED_LIMIT;
 		speed_R = MOTOR_SPEED_LIMIT;
 		state = BACK_LEFT;
@@ -134,20 +131,14 @@ void find_sound(float micro0, float micro1, float micro2)
 		// if micro1 > micro0 -> error = micro1-micro0 > 0 -> turn left
 		// if micro1 < micro0 -> error = micro1-micro0 < 0 -> turn right
 		if(micro1 > micro0) //devant droit
-		{
-			toggle_rgb_led(LED8, RED_LED, 255);
-			toggle_rgb_led(LED8, GREEN_LED, 255);
-		}
+			state = FRONT_RIGHT;
 		else //devant gauche
-		{
-			toggle_rgb_led(LED2, RED_LED, 255);
-			toggle_rgb_led(LED2, BLUE_LED, 255);
-		}
+			state = FRONT_LEFT;
+
 		pid = calcul_pid(micro1, micro0, THRESHOLD, MOTOR_SPEED_LIMIT);
 		speed = Kp*pid.error + Ki*pid.integral + Kd*pid.derivate;
 		speed_L = 550-speed;
 		speed_R = 550+speed;
-		state = FRONT;
 	}
 }
 /*

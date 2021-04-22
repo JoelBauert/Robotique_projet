@@ -18,6 +18,7 @@
 #include <communications.h>
 #include <arm_math.h>
 #include <spi_comm.h>
+#include <leds.h>
 
 //uncomment to use the microphones
 #define USE_MIC
@@ -104,9 +105,10 @@ int main(void)
         //waits until a result must be sent to the computer
         wait_send_to_computer();
 #endif /* SEND_TO_COMPUTER */
+
         // commande des moteurs
         int state = get_state();
-        if(get_stop() && state == FRONT){
+        if(get_stop() && (state == FRONT_LEFT || state == FRONT_RIGHT)){
 			left_motor_set_speed(0);
 			right_motor_set_speed(0);
         }
@@ -114,6 +116,28 @@ int main(void)
         	left_motor_set_speed(get_speed_left());
         	right_motor_set_speed(get_speed_right());
         }
+
+        // commande aux leds
+        if(state == BACK_RIGHT){
+        	clear_leds();
+        	toggle_rgb_led(LED4, GREEN_LED, 255);
+        }
+        else if(state == BACK_LEFT){
+        	clear_leds();
+        	toggle_rgb_led(LED6, RED_LED, 255);
+        }
+        else if(state == FRONT_RIGHT){
+        	clear_leds();
+        	toggle_rgb_led(LED8, RED_LED, 255);
+        	toggle_rgb_led(LED8, GREEN_LED, 255);
+        }
+        else if(state == FRONT_LEFT){
+        	clear_leds();
+        	toggle_rgb_led(LED2, RED_LED, 255);
+        	toggle_rgb_led(LED2, BLUE_LED, 255);
+        }
+        else
+        	clear_leds();
 
 #ifdef DOUBLE_BUFFERING
         //we copy the buffer to avoid conflicts
