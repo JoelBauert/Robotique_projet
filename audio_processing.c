@@ -147,6 +147,8 @@ void find_sound(float micro0, float micro1, float micro2)
 *							so we have [micRight1, micLeft1, micBack1, micFront1, micRight2, etc...]
 *	uint16_t num_samples	Tells how many data we get in total (should always be 640)
 */
+
+//led2 back_right,
 void processAudioData(int16_t *data, uint16_t num_samples){
 
 	/*
