@@ -10,7 +10,9 @@
 #define FL_49 6 // front left 49'
 #define FL_17 7 // front right 17'
 
+#define THRESHOLD_DIST 300
+
 void distance_start(void);
-void find_distance(void);
+//void find_distance(void);
 
 #endif
