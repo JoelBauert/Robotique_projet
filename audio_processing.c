@@ -133,15 +133,15 @@ void find_sound(float micro0, float micro1, float micro2)
 	if(micro1 > micro2 && micro0 > micro2){ // front right or left
 		// if micro1 > micro0 -> error = micro1-micro0 > 0 -> turn left
 		// if micro1 < micro0 -> error = micro1-micro0 < 0 -> turn right
-		if(micro1 > micro0)
-		{
-			toggle_rgb_led(LED2, RED_LED, 255);
-			toggle_rgb_led(LED2, GREEN_LED, 255);
-		}
-		else
+		if(micro1 > micro0) //devant droit
 		{
 			toggle_rgb_led(LED8, RED_LED, 255);
-			toggle_rgb_led(LED8, BLUE_LED, 255);
+			toggle_rgb_led(LED8, GREEN_LED, 255);
+		}
+		else //devant gauche
+		{
+			toggle_rgb_led(LED2, RED_LED, 255);
+			toggle_rgb_led(LED2, BLUE_LED, 255);
 		}
 		pid = calcul_pid(micro1, micro0, THRESHOLD, MOTOR_SPEED_LIMIT);
 		speed = Kp*pid.error + Ki*pid.integral + Kd*pid.derivate;
