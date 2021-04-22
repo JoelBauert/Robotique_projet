@@ -17,6 +17,7 @@
 #include <distance.h>
 #include <communications.h>
 #include <arm_math.h>
+#include <spi_comm.h>
 
 //uncomment to use the microphones
 #define USE_MIC
@@ -80,6 +81,8 @@ int main(void)
     proximity_start();
     //start distance measurement
     distance_start();
+    //start spi for leds
+    spi_comm_start();
 
     //temp tab used to store values in complex_float format
     //needed bx doFFT_c
