@@ -34,7 +34,6 @@ float get_speed_right(void);
 float get_speed_left(void);
 uint8_t get_state(void);
 
-//dans pi_processor.h max= #define MAX_SUM_ERROR 			(MOTOR_SPEED_LIMIT/KI)
 PID_obj calcul_pid(float val1, float val2, float threshold, float max);
 
 void find_sound(float micro0, float micro1, float micro2);

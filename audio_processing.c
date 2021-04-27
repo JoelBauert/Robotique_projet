@@ -46,8 +46,9 @@ static float micBack_output[FFT_SIZE];
 #define Kp				1
 #define Ki				0
 #define Kd				0
-#define THRESHOLD		10000
+#define THRESHOLD		10000 //minimum amplitude difference for the pid to recognize and set an error term
 
+//speed and state variables for motor controls
 static float speed_R;
 static float speed_L;
 static uint8_t state;
@@ -99,7 +100,6 @@ PID_obj calcul_pid(float val1, float val2, float threshold, float max)
 
 /*
 *	Simple function used to detect the highest value in a buffer
-*	and to execute a motor command depending on it
 */
 
 float sound_remote(float* data){
@@ -124,7 +124,6 @@ float sound_remote(float* data){
  *	micro0-2			magnitudes of the three microphone signals
  */
 
-//led2 front_right, led4 back_right, led6 back left, led8 front_left
 void find_sound(float micro0, float micro1, float micro2)
 {
 	if(micro2 > micro1 && micro2 > micro0 && micro0 > micro1){ // back right
@@ -161,6 +160,7 @@ void find_sound(float micro0, float micro1, float micro2)
 /*
 *	Callback called when the demodulation of the four microphones is done.
 *	We get 160 samples per mic every 10ms (16kHz)
+*	Then calculate the FFT and magnitude and initiate the calculation for the sound's location
 *
 *	params :
 *	int16_t *data			Buffer containing 4 times 160 samples. the samples are sorted by micro
@@ -168,7 +168,6 @@ void find_sound(float micro0, float micro1, float micro2)
 *	uint16_t num_samples	Tells how many data we get in total (should always be 640)
 */
 
-//led2 front_right, led4 back_right, led6 back left, led8 front_left
 void processAudioData(int16_t *data, uint16_t num_samples){
 
 	/*
@@ -206,7 +205,6 @@ void processAudioData(int16_t *data, uint16_t num_samples){
 	}
 
 	if(nb_samples >= (2 * FFT_SIZE)){
-		float micro0, micro1, micro2;
 		/*	FFT proccessing
 		*
 		*	This FFT function stores the results in the input buffer given.
@@ -240,11 +238,7 @@ void processAudioData(int16_t *data, uint16_t num_samples){
 		nb_samples = 0;
 		mustSend++;
 
-		micro0 = sound_remote(micRight_output);
-		micro1 = sound_remote(micLeft_output);
-		micro2 = sound_remote(micBack_output);
-
-		find_sound(micro0, micro1, micro2);
+		find_sound(sound_remote(micRight_output), sound_remote(micLeft_output), sound_remote(micBack_output));
 	}
 }
 
