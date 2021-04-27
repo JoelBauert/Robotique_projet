@@ -29,6 +29,7 @@
 //uncomment to send the mic data to the computer
 //#define SEND_TO_COMPUTER
 
+// initialize communication bus
 messagebus_t bus;
 MUTEX_DECL(bus_lock);
 CONDVAR_DECL(bus_condvar);
@@ -99,15 +100,16 @@ int main(void)
 #endif  /* USE_MIC */
 
     /* Infinite loop. */
-    while (1) {
+    while (1)
+{
 #ifdef USE_MIC
 #ifdef SEND_TO_COMPUTER
         //waits until a result must be sent to the computer
         wait_send_to_computer();
-#endif /* SEND_TO_COMPUTER */
-
-        // commande des moteurs
+#else
+        // moteur controls
         int state = get_state();
+        //if we are close to an obstacle: moving forward is not permissible, but turning around is
         if(get_stop() && (state == FRONT_LEFT || state == FRONT_RIGHT)){
 			left_motor_set_speed(0);
 			right_motor_set_speed(0);
@@ -117,7 +119,7 @@ int main(void)
         	right_motor_set_speed(get_speed_right());
         }
 
-        // commande aux leds
+        // set leds to indicate the direction the sound is coming from
         if(state == BACK_RIGHT){
         	clear_leds();
         	toggle_rgb_led(LED4, GREEN_LED, 255);
@@ -138,7 +140,7 @@ int main(void)
         }
         else
         	clear_leds();
-
+#endif /* SEND_TO_COMPUTER */
 #ifdef DOUBLE_BUFFERING
         //we copy the buffer to avoid conflicts
         arm_copy_f32(get_audio_buffer_ptr(LEFT_OUTPUT), send_tab, FFT_SIZE);
