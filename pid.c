@@ -7,10 +7,14 @@
 #include <pid.h>
 #include <math.h>
 
-#define Kp				1
-#define Ki				0
-#define Kd				0
+static float Kp, Ki, Kd;
 
+get_pid_param(float kp, float ki, float kd)
+{
+	Kp = kp;
+	Ki = ki;
+	Kd = kd;
+}
 
 float calcul_pid(float val1, float val2, float threshold, float max)
 {
@@ -38,6 +42,7 @@ float calcul_pid(float val1, float val2, float threshold, float max)
 	pid.integral = integral;
 
 	pid.derivate = error-previous_error;
+
 
 	speed = Kp*pid.error + Ki*pid.integral + Kd*pid.derivate;
 
