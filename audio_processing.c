@@ -44,9 +44,7 @@ static float micBack_output[FFT_SIZE];
 #define FREQ_BACKWARD_L		(FREQ_BACKWARD-1)
 #define FREQ_BACKWARD_H		(FREQ_BACKWARD+1)
 
-#define Kp				1
-#define Ki				0
-#define Kd				0
+
 #define THRESHOLD		10000
 
 static float speed_R;
@@ -111,7 +109,7 @@ void find_sound(float micro0, float micro1, float micro2)
 
 		//pid = calcul_pid(micro1, micro0, THRESHOLD, MOTOR_SPEED_LIMIT);
 		//speed = Kp*pid.error + Ki*pid.integral + Kd*pid.derivate;
-		get_pid_param(Kp, Ki, Kd);
+		//set_pid_param(Kp, Ki, Kd);
 		speed = calcul_pid(micro1, micro0, THRESHOLD, MOTOR_SPEED_LIMIT);
 		speed_L = 550-speed;
 		speed_R = 550+speed;

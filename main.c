@@ -20,6 +20,9 @@
 #include <spi_comm.h>
 #include <leds.h>
 
+#define Kp				1
+#define Ki				0
+#define Kd				0
 //uncomment to use the microphones
 #define USE_MIC
 
@@ -84,6 +87,8 @@ int main(void)
     distance_start();
     //start spi for leds
     spi_comm_start();
+    //init pid_parameter Kp, Ki, Kd
+    set_pid_param(Kp, Ki, Kd);
 
     //temp tab used to store values in complex_float format
     //needed bx doFFT_c

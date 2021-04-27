@@ -9,7 +9,7 @@
 
 static float Kp, Ki, Kd;
 
-void get_pid_param(float kp, float ki, float kd)
+void set_pid_param(float kp, float ki, float kd)
 {
 	Kp = kp;
 	Ki = ki;
