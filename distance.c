@@ -7,13 +7,14 @@
 #include <usbcfg.h>
 #include <chprintf.h>
 
-static uint8_t stop;
+static uint8_t stop; //boolean value to signal that an obstacle is close
 
 uint8_t get_stop(void)
 {
 	return stop;
 }
 
+//tread for handling the IR proximity sensors
 static THD_WORKING_AREA(distance_thd_wa, 256);
 static THD_FUNCTION(distance_thd, arg)
 {
@@ -23,17 +24,23 @@ static THD_FUNCTION(distance_thd, arg)
 	}
 }
 
+/*
+ * function initializing the thread
+ */
 void distance_start(void)
 {
 	chThdCreateStatic(distance_thd_wa, sizeof(distance_thd_wa), NORMALPRIO, distance_thd, NULL);
 }
 
+/*
+ * function to check the 4 front facing proximity sensors and set the stop boolean if the e-puck is close to an obstacle
+ */
 void find_distance(void)
 {
 	int d_FR_17, d_FR_49, d_R, d_BR, d_BL, d_L, d_FL_49, d_FL_17;
 	calibrate_ir();
 
-	d_FR_17 = get_prox(FR_17);
+	d_FR_17 = get_prox(FR_17); //ir sensor front right 17 degrees
 	d_FR_49 = get_prox(FR_49);
 	d_FL_17 = get_prox(FL_17);
 	d_FL_49 = get_prox(FL_49);

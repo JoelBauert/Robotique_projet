@@ -10,11 +10,11 @@
 #define FL_49 6 // front left 49'
 #define FL_17 7 // front right 17'
 
-#define THRESHOLD_DIST 200
+#define THRESHOLD_DIST 200 //distance at which the e-puck should stop
 
 uint8_t get_stop(void);
 
 void distance_start(void);
-//void find_distance(void);
+void find_distance(void);
 
 #endif
