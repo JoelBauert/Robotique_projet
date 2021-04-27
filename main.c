@@ -66,6 +66,20 @@ static void timer12_start(void){
     gptStartContinuous(&GPTD12, 0xFFFF);
 }
 
+uint8_t color_convertion(float frequency)
+{
+	//frequency between 2 kHz and 5 kHz -> audible
+	uint8_t color = 0;
+	if(frequency >= 5000)
+		color = 255;
+	else if(frequency <= 2000)
+		color = 0;
+	else
+		color = (uint8_t)(frequency*255/(5000-2000)-1/85);
+	return color;
+
+}
+
 int main(void)
 {
 
@@ -125,25 +139,26 @@ int main(void)
         }
 
         // commande aux leds
+        uint8_t color = color_convertion(get_frequency());
         if(state == BACK_RIGHT){
         	clear_leds();
         	toggle_rgb_led(LED4, GREEN_LED, 255);
-        	toggle_rgb_led(LED4, RED_LED, get_frequency());
+        	toggle_rgb_led(LED4, RED_LED, color);
         }
         else if(state == BACK_LEFT){
         	clear_leds();
         	toggle_rgb_led(LED6, RED_LED, 255);
-        	toggle_rgb_led(LED4, BLUE_LED, get_frequency());
+        	toggle_rgb_led(LED4, BLUE_LED, color);
         }
         else if(state == FRONT_RIGHT){
         	clear_leds();
         	toggle_rgb_led(LED8, GREEN_LED, 255);
-        	toggle_rgb_led(LED4, RED_LED, get_frequency());
+        	toggle_rgb_led(LED4, RED_LED, color);
         }
         else if(state == FRONT_LEFT){
         	clear_leds();
         	toggle_rgb_led(LED2, RED_LED, 255);
-        	toggle_rgb_led(LED4, GREEN_LED, get_frequency());
+        	toggle_rgb_led(LED4, GREEN_LED, color);
         }
         else
         	clear_leds();

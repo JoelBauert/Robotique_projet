@@ -67,6 +67,7 @@ uint8_t get_state(void)
 
 float get_frequency(void)
 {
+	frequency = 150-abs(frequency)*150/512;
 	return frequency;
 }
 
@@ -78,7 +79,7 @@ float sound_remote(float* data){
 	for(uint16_t i = MIN_FREQ ; i <= MAX_FREQ ; i++){
 		if(data[i] > max_norm){
 			max_norm = data[i];
-			frequency = i;
+			frequency = i; //position detected but not the real frequency
 		}
 	}
 	return max_norm;
