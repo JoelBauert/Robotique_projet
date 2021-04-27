@@ -52,6 +52,10 @@ static float speed_R;
 static float speed_L;
 static uint8_t state;
 
+/*
+ * functions to pass the variables to main
+ */
+
 float get_speed_right(void)
 {
 	return speed_R;
@@ -93,6 +97,11 @@ PID_obj calcul_pid(float val1, float val2, float threshold, float max)
 	return pid;
 }
 
+/*
+*	Simple function used to detect the highest value in a buffer
+*	and to execute a motor command depending on it
+*/
+
 float sound_remote(float* data){
 	float max_norm = MIN_VALUE_THRESHOLD;
 	int16_t max_norm_index = -1;
@@ -106,6 +115,14 @@ float sound_remote(float* data){
 	}
 	return max_norm;
 }
+
+/*
+ *	function to determine which direction the sound is coming from
+ *	and how to turn or advance towards it
+ *
+ *	parameters:
+ *	micro0-2			magnitudes of the three microphone signals
+ */
 
 //led2 front_right, led4 back_right, led6 back left, led8 front_left
 void find_sound(float micro0, float micro1, float micro2)
@@ -128,13 +145,13 @@ void find_sound(float micro0, float micro1, float micro2)
 	float speed = 0;
 	PID_obj pid;
 	if(micro1 > micro2 && micro0 > micro2){ // front right or left
-		// if micro1 > micro0 -> error = micro1-micro0 > 0 -> turn left
-		// if micro1 < micro0 -> error = micro1-micro0 < 0 -> turn right
-		if(micro1 > micro0) //devant droit
+		if(micro1 > micro0)
 			state = FRONT_RIGHT;
-		else //devant gauche
+		else
 			state = FRONT_LEFT;
 
+		// if micro1 > micro0 -> error = micro1-micro0 > 0 -> turn left
+		// if micro1 < micro0 -> error = micro1-micro0 < 0 -> turn right
 		pid = calcul_pid(micro1, micro0, THRESHOLD, MOTOR_SPEED_LIMIT);
 		speed = Kp*pid.error + Ki*pid.integral + Kd*pid.derivate;
 		speed_L = 550-speed;
