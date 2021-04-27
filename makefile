@@ -14,6 +14,7 @@ CSRC += ./main.c \
 		./communications.c \
 		./fft.c \
 		./distance.c \
+		./pid.c \
 
 #Header folders to include
 INCDIR += 

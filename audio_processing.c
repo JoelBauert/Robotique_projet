@@ -4,6 +4,7 @@
 #include <usbcfg.h>
 #include <chprintf.h>
 
+#include <pid.h>
 #include <motors.h>
 #include <audio/microphone.h>
 #include <audio_processing.h>
@@ -70,33 +71,7 @@ uint8_t get_state(void)
 	return state;
 }
 
-PID_obj calcul_pid(float val1, float val2, float threshold, float max)
-{
-	PID_obj pid;
-	static float integral = 0;
-	static float previous_error = 0;
 
-	float error = val1-val2;
-
-	if(fabs(error) <= threshold)
-	{
-		integral = 0;
-		return pid;
-	}
-	pid.error = error;
-
-	integral += error;
-	if(integral > max){
-		integral = max;
-	}else if(integral < -max){
-		integral = -max;
-	}
-	pid.integral = integral;
-
-	pid.derivate = error-previous_error;
-
-	return pid;
-}
 
 /*
 *	Simple function used to detect the highest value in a buffer
@@ -142,7 +117,6 @@ void find_sound(float micro0, float micro1, float micro2)
 	}
 
 	float speed = 0;
-	PID_obj pid;
 	if(micro1 > micro2 && micro0 > micro2){ // front right or left
 		if(micro1 > micro0)
 			state = FRONT_RIGHT;
@@ -151,8 +125,8 @@ void find_sound(float micro0, float micro1, float micro2)
 
 		// if micro1 > micro0 -> error = micro1-micro0 > 0 -> turn left
 		// if micro1 < micro0 -> error = micro1-micro0 < 0 -> turn right
-		pid = calcul_pid(micro1, micro0, THRESHOLD, MOTOR_SPEED_LIMIT);
-		speed = Kp*pid.error + Ki*pid.integral + Kd*pid.derivate;
+		get_pid_param(Kp, Ki, Kd);
+		speed = calcul_pid(micro1, micro0, THRESHOLD, MOTOR_SPEED_LIMIT);
 		speed_L = 550-speed;
 		speed_R = 550+speed;
 	}

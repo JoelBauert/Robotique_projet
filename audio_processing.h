@@ -23,18 +23,11 @@ typedef enum {
 } BUFFER_NAME_t;
 
 //éventuellement le mettre dans un fichier à part
-typedef struct
-{
-	float error;
-	float integral;
-	float derivate;
-} PID_obj;
+
 
 float get_speed_right(void);
 float get_speed_left(void);
 uint8_t get_state(void);
-
-PID_obj calcul_pid(float val1, float val2, float threshold, float max);
 
 void find_sound(float micro0, float micro1, float micro2);
 
