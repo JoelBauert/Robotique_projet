@@ -28,6 +28,7 @@ typedef enum {
 float get_speed_right(void);
 float get_speed_left(void);
 uint8_t get_state(void);
+float get_frequency(void);
 
 //dans pi_processor.h max= #define MAX_SUM_ERROR 			(MOTOR_SPEED_LIMIT/KI)
 

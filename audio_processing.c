@@ -45,11 +45,12 @@ static float micBack_output[FFT_SIZE];
 #define FREQ_BACKWARD_H		(FREQ_BACKWARD+1)
 
 
-#define THRESHOLD		10000
+
 
 static float speed_R;
 static float speed_L;
 static uint8_t state;
+static float frequency;
 
 float get_speed_right(void)
 {
@@ -64,23 +65,26 @@ uint8_t get_state(void)
 	return state;
 }
 
-
+float get_frequency(void)
+{
+	return frequency;
+}
 
 float sound_remote(float* data){
 	float max_norm = MIN_VALUE_THRESHOLD;
-	int16_t max_norm_index = -1;
+//	int16_t max_norm_index = -1;
 
 	//search for the highest peak
 	for(uint16_t i = MIN_FREQ ; i <= MAX_FREQ ; i++){
 		if(data[i] > max_norm){
 			max_norm = data[i];
-			max_norm_index = i;
+			frequency = i;
 		}
 	}
 	return max_norm;
 }
 
-//led2 front_right, led4 back_right, led6 back left, led8 front_left
+
 void find_sound(float micro0, float micro1, float micro2)
 {
 	if(micro2 > micro1 && micro2 > micro0 && micro0 > micro1){ // back right
@@ -110,7 +114,7 @@ void find_sound(float micro0, float micro1, float micro2)
 		//pid = calcul_pid(micro1, micro0, THRESHOLD, MOTOR_SPEED_LIMIT);
 		//speed = Kp*pid.error + Ki*pid.integral + Kd*pid.derivate;
 		//set_pid_param(Kp, Ki, Kd);
-		speed = calcul_pid(micro1, micro0, THRESHOLD, MOTOR_SPEED_LIMIT);
+		speed = calcul_pid(micro1, micro0, MOTOR_SPEED_LIMIT);
 		speed_L = 550-speed;
 		speed_R = 550+speed;
 	}
@@ -125,7 +129,6 @@ void find_sound(float micro0, float micro1, float micro2)
 *	uint16_t num_samples	Tells how many data we get in total (should always be 640)
 */
 
-//led2 front_right, led4 back_right, led6 back left, led8 front_left
 void processAudioData(int16_t *data, uint16_t num_samples){
 
 	/*

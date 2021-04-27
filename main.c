@@ -20,9 +20,11 @@
 #include <spi_comm.h>
 #include <leds.h>
 
+//PID parameters
 #define Kp				1
 #define Ki				0
 #define Kd				0
+#define THRESHOLD		10000
 //uncomment to use the microphones
 #define USE_MIC
 
@@ -87,8 +89,8 @@ int main(void)
     distance_start();
     //start spi for leds
     spi_comm_start();
-    //init pid_parameter Kp, Ki, Kd
-    set_pid_param(Kp, Ki, Kd);
+    //init pid_parameter Kp, Ki, Kd, THRESHOLD
+    set_pid_param(Kp, Ki, Kd, THRESHOLD);
 
     //temp tab used to store values in complex_float format
     //needed bx doFFT_c
@@ -126,20 +128,22 @@ int main(void)
         if(state == BACK_RIGHT){
         	clear_leds();
         	toggle_rgb_led(LED4, GREEN_LED, 255);
+        	toggle_rgb_led(LED4, RED_LED, get_frequency());
         }
         else if(state == BACK_LEFT){
         	clear_leds();
         	toggle_rgb_led(LED6, RED_LED, 255);
+        	toggle_rgb_led(LED4, BLUE_LED, get_frequency());
         }
         else if(state == FRONT_RIGHT){
         	clear_leds();
-        	toggle_rgb_led(LED8, RED_LED, 255);
         	toggle_rgb_led(LED8, GREEN_LED, 255);
+        	toggle_rgb_led(LED4, RED_LED, get_frequency());
         }
         else if(state == FRONT_LEFT){
         	clear_leds();
         	toggle_rgb_led(LED2, RED_LED, 255);
-        	toggle_rgb_led(LED2, BLUE_LED, 255);
+        	toggle_rgb_led(LED4, GREEN_LED, get_frequency());
         }
         else
         	clear_leds();
