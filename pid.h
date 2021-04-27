@@ -14,7 +14,7 @@ typedef struct
 	float derivate;
 } PID_obj;
 
-get_pid_param(float kp, float ki, float kd);
+void get_pid_param(float kp, float ki, float kd);
 float calcul_pid(float val1, float val2, float threshold, float max);
 
 

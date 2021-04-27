@@ -101,7 +101,6 @@ void find_sound(float micro0, float micro1, float micro2)
 	}
 
 	float speed = 0;
-	PID_obj pid;
 	if(micro1 > micro2 && micro0 > micro2){ // front right or left
 		// if micro1 > micro0 -> error = micro1-micro0 > 0 -> turn left
 		// if micro1 < micro0 -> error = micro1-micro0 < 0 -> turn right
