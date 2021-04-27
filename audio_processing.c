@@ -4,6 +4,7 @@
 #include <usbcfg.h>
 #include <chprintf.h>
 
+#include <pid.h>
 #include <motors.h>
 #include <audio/microphone.h>
 #include <audio_processing.h>
@@ -43,9 +44,6 @@ static float micBack_output[FFT_SIZE];
 #define FREQ_BACKWARD_L		(FREQ_BACKWARD-1)
 #define FREQ_BACKWARD_H		(FREQ_BACKWARD+1)
 
-#define Kp				1
-#define Ki				0
-#define Kd				0
 #define THRESHOLD		10000
 
 static float speed_R;
@@ -65,33 +63,7 @@ uint8_t get_state(void)
 	return state;
 }
 
-PID_obj calcul_pid(float val1, float val2, float threshold, float max)
-{
-	PID_obj pid;
-	static float integral = 0;
-	static float previous_error = 0;
 
-	float error = val1-val2;
-
-	if(fabs(error) <= threshold)
-	{
-		integral = 0;
-		return pid;
-	}
-	pid.error = error;
-
-	integral += error;
-	if(integral > max){
-		integral = max;
-	}else if(integral < -max){
-		integral = -max;
-	}
-	pid.integral = integral;
-
-	pid.derivate = error-previous_error;
-
-	return pid;
-}
 
 float sound_remote(float* data){
 	float max_norm = MIN_VALUE_THRESHOLD;
@@ -135,8 +107,9 @@ void find_sound(float micro0, float micro1, float micro2)
 		else //devant gauche
 			state = FRONT_LEFT;
 
-		pid = calcul_pid(micro1, micro0, THRESHOLD, MOTOR_SPEED_LIMIT);
-		speed = Kp*pid.error + Ki*pid.integral + Kd*pid.derivate;
+		//pid = calcul_pid(micro1, micro0, THRESHOLD, MOTOR_SPEED_LIMIT);
+		//speed = Kp*pid.error + Ki*pid.integral + Kd*pid.derivate;
+		speed = calcul_pid(micro1, micro0, THRESHOLD, MOTOR_SPEED_LIMIT);
 		speed_L = 550-speed;
 		speed_R = 550+speed;
 	}
