@@ -44,7 +44,9 @@ static float micBack_output[FFT_SIZE];
 #define FREQ_BACKWARD_L		(FREQ_BACKWARD-1)
 #define FREQ_BACKWARD_H		(FREQ_BACKWARD+1)
 
-
+//parameter to find the frequency with the index position
+#define B					150
+#define A					150/512
 
 
 static float speed_R;
@@ -67,7 +69,7 @@ uint8_t get_state(void)
 
 float get_frequency(void)
 {
-	frequency = 150-abs(frequency)*150/512;
+	frequency = B-abs(frequency)*A;
 	return frequency;
 }
 
