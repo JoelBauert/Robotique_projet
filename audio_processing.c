@@ -134,6 +134,20 @@ void find_sound(float micro0, float micro1, float micro2)
 		speed = calcul_pid(micro1, micro0, MOTOR_SPEED_LIMIT);
 		speed_L = 550-speed;
 		speed_R = 550+speed;
+
+		if(speed_L > MOTOR_SPEED_LIMIT){
+			speed_L = MOTOR_SPEED_LIMIT;
+		}
+		else if(speed_L < -MOTOR_SPEED_LIMIT){
+				speed_L = -MOTOR_SPEED_LIMIT;
+		}
+
+		if(speed_R > MOTOR_SPEED_LIMIT){
+			speed_R = MOTOR_SPEED_LIMIT;
+		}
+		else if(speed_R < -MOTOR_SPEED_LIMIT){
+			speed_R = -MOTOR_SPEED_LIMIT;
+		}
 		chprintf((BaseSequentialStream *)&SD3, "%f %f\r\n",speed_L, speed_R);
 	}
 }
