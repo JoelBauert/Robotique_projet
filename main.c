@@ -13,6 +13,7 @@
 #include <sensors/proximity.h>
 
 #include <audio_processing.h>
+#include <pid.h>
 #include <fft.h>
 #include <distance.h>
 #include <communications.h>
