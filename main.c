@@ -25,6 +25,15 @@
 #define Ki				0
 #define Kd				0
 #define THRESHOLD		10000
+
+//define color parameters
+#define MAX_COLOR		255
+#define MIN_COLOR		0
+//define audible frequency parameters
+#define MIN_FREQU		300
+#define MAX_FREQU		700
+#define A				MAX_COLOR/(MAX_FREQU-MIN_FREQU)
+#define B				-MAX_COLOR/(MAX_FREQU-MIN_FREQU)*MIN_FREQU
 //uncomment to use the microphones
 #define USE_MIC
 
@@ -70,12 +79,12 @@ uint8_t color_convertion(float frequency)
 {
 	//frequency between 2 kHz and 5 kHz -> audible
 	uint8_t color = 0;
-	if(frequency >= 5000)
-		color = 255;
-	else if(frequency <= 2000)
-		color = 0;
+	if(frequency >= MAX_FREQU)
+		color = MAX_COLOR;
+	else if(frequency <= MIN_FREQU)
+		color = MIN_COLOR;
 	else
-		color = (uint8_t)(frequency*255/(5000-2000)-1/85);
+		color = (uint8_t)(A*frequency+B);
 	return color;
 
 }
@@ -142,22 +151,22 @@ int main(void)
         uint8_t color = color_convertion(get_frequency());
         if(state == BACK_RIGHT){
         	clear_leds();
-        	toggle_rgb_led(LED4, GREEN_LED, 255);
+        	toggle_rgb_led(LED4, GREEN_LED, MAX_COLOR);
         	toggle_rgb_led(LED4, RED_LED, color);
         }
         else if(state == BACK_LEFT){
         	clear_leds();
-        	toggle_rgb_led(LED6, RED_LED, 255);
+        	toggle_rgb_led(LED6, RED_LED, MAX_COLOR);
         	toggle_rgb_led(LED4, BLUE_LED, color);
         }
         else if(state == FRONT_RIGHT){
         	clear_leds();
-        	toggle_rgb_led(LED8, GREEN_LED, 255);
+        	toggle_rgb_led(LED8, GREEN_LED, MAX_COLOR);
         	toggle_rgb_led(LED4, RED_LED, color);
         }
         else if(state == FRONT_LEFT){
         	clear_leds();
-        	toggle_rgb_led(LED2, RED_LED, 255);
+        	toggle_rgb_led(LED2, RED_LED, MAX_COLOR);
         	toggle_rgb_led(LED4, GREEN_LED, color);
         }
         else
