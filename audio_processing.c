@@ -94,7 +94,18 @@ void find_sound(float micro0, float micro1, float micro2)
 	static uint16_t i = 0;
 	i++;
 	chprintf((BaseSequentialStream *)&SD3, "micro2=%f, micro1=%f, micro0=%f, i=%d \r\n", micro2, micro1, micro0, i);
-	if(micro2 > micro1 && micro2 > micro0 && micro0 > micro1){ // back right
+	//if(micro2 > micro1 && micro2 > micro0 && micro0 > micro1){ // back right
+	if(micro2 > micro1){ //arrière droite
+		if(micro2 > micro0){
+			if(micro1 > micro0){
+				// turn left
+				speed_L = -MOTOR_SPEED_LIMIT;
+				speed_R = MOTOR_SPEED_LIMIT;
+				chprintf((BaseSequentialStream *)&SD3, "speed_L=%f, speed_R=%f\r\n",speed_L, speed_R);
+				state = BACK_LEFT;
+				return;
+			}
+		}
 		// turn right
 		speed_L = MOTOR_SPEED_LIMIT;
 		speed_R = -MOTOR_SPEED_LIMIT;
@@ -102,7 +113,8 @@ void find_sound(float micro0, float micro1, float micro2)
 		state = BACK_RIGHT;
 		return;
 	}
-	if(micro2 > micro1 && micro2 > micro0 && micro1 > micro0){ // back left
+	//if(micro2 > micro1 && micro2 > micro0 && micro1 > micro0){ // back left
+	else if(micro2 > micro0){
 		// turn left
 		speed_L = -MOTOR_SPEED_LIMIT;
 		speed_R = MOTOR_SPEED_LIMIT;
@@ -110,9 +122,8 @@ void find_sound(float micro0, float micro1, float micro2)
 		state = BACK_LEFT;
 		return;
 	}
-
-	float speed = 0;
-	if(micro1 > micro2 && micro0 > micro2){ // front right or left
+	else if(micro1 > micro2 && micro0 > micro2){ // front right or left
+		float speed = 0;
 		// if micro1 > micro0 -> error = micro1-micro0 > 0 -> turn left
 		// if micro1 < micro0 -> error = micro1-micro0 < 0 -> turn right
 		if(micro1 > micro0) //devant droit
@@ -120,9 +131,6 @@ void find_sound(float micro0, float micro1, float micro2)
 		else //devant gauche
 			state = FRONT_LEFT;
 
-		//pid = calcul_pid(micro1, micro0, THRESHOLD, MOTOR_SPEED_LIMIT);
-		//speed = Kp*pid.error + Ki*pid.integral + Kd*pid.derivate;
-		//set_pid_param(Kp, Ki, Kd);
 		speed = calcul_pid(micro1, micro0, MOTOR_SPEED_LIMIT);
 		speed_L = 550-speed;
 		speed_R = 550+speed;
