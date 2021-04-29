@@ -64,7 +64,11 @@ float calcul_pid(float val1, float val2, float max)
 
 
 	output_regulated = Kp*pid.error + Ki*pid.integral + Kd*pid.derivate;
-
+	if(output_regulated > max){
+		output_regulated = max;
+		}else if(output_regulated < -max){
+			output_regulated = -max;
+		}
 	return output_regulated;
 }
 
