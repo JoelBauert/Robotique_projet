@@ -93,7 +93,7 @@ void find_sound(float micro0, float micro1, float micro2)
 	//graphe index
 	static uint16_t i = 0;
 	i++;
-	chprintf((BaseSequentialStream *)&SD3, "%f %f %f %d \r\n", micro2, micro1, micro0, i);
+	chprintf((BaseSequentialStream *)&SD3, "%f %f %f %d ", micro2, micro1, micro0, i);
 	//if(micro2 > micro1 && micro2 > micro0 && micro0 > micro1){ // back right
 	if(micro2 > micro1){ //arrière droite
 		if(micro2 > micro0){
