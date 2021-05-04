@@ -22,7 +22,7 @@
 #include <leds.h>
 
 //PID parameters
-#define Kp				1
+#define Kp				0.055
 #define Ki				0
 #define Kd				0
 #define THRESHOLD		10000

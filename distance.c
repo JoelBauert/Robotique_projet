@@ -17,9 +17,12 @@ uint8_t get_stop(void)
 static THD_WORKING_AREA(distance_thd_wa, 256);
 static THD_FUNCTION(distance_thd, arg)
 {
+	systime_t time;
 	while(1)
 	{
-	find_distance();
+		time = chVTGetSystemTime();
+		find_distance();
+		chThdSleepUntilWindowed(time, time + MS2ST(10)); //reduced the sample rate to 100Hz
 	}
 }
 
