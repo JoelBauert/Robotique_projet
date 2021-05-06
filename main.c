@@ -23,7 +23,7 @@
 
 //PID parameters
 #define Kp				0.055
-#define Ki				0
+#define Ki				0.001
 #define Kd				0
 #define THRESHOLD		10000
 
