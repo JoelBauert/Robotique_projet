@@ -52,11 +52,14 @@ float calcul_pid(float val1, float val2, float max)
 	}
 	pid.error = error;
 
-	integral += error;
-	if(integral > max){
-		integral = max;
-	}else if(integral < -max){
-		integral = -max;
+	if(Ki){
+		integral += error;
+		max = max/Ki;
+		if(integral > max){
+			integral = max;
+		}else if(integral < -max){
+			integral = -max;
+		}
 	}
 	pid.integral = integral;
 

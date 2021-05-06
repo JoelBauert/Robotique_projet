@@ -115,7 +115,7 @@ int main(void)
     spi_comm_start();
 
     //init pid_parameter Kp, Ki, Kd, THRESHOLD
-    set_pid_param(0.055, 0.01, 0, 10000);
+    set_pid_param(0.055, 0.001, 0, 10000);
 
     //temp tab used to store values in complex_float format
     //needed bx doFFT_c
