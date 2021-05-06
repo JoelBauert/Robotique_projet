@@ -23,7 +23,7 @@
 
 //PID parameters
 #define Kp				0.055
-#define Ki				0
+#define Ki				0.01
 #define Kd				0
 #define THRESHOLD		10000
 
@@ -31,10 +31,8 @@
 #define MAX_COLOR		255
 #define MIN_COLOR		0
 //define audible frequency parameters
-#define MIN_FREQU		300
-#define MAX_FREQU		700
-#define A				MAX_COLOR/(MAX_FREQU-MIN_FREQU)
-#define B				-MAX_COLOR/(MAX_FREQU-MIN_FREQU)*MIN_FREQU
+#define MIN_FREQU		22
+#define MAX_FREQU		38
 //uncomment to use the microphones
 #define USE_MIC
 
@@ -85,14 +83,16 @@ static void timer12_start(void){
 uint8_t color_convertion(float frequency)
 {
 	//frequency between 2 kHz and 5 kHz -> audible
-	uint8_t color = 0;
+	float color = 0;
+	float A = (float)MAX_COLOR/(MAX_FREQU-MIN_FREQU);
+	float B = -(float)MAX_COLOR/(MAX_FREQU-MIN_FREQU)*MIN_FREQU;
 	if(frequency >= MAX_FREQU)
 		color = MAX_COLOR;
 	else if(frequency <= MIN_FREQU)
 		color = MIN_COLOR;
 	else
-		color = (uint8_t)(A*frequency+B);
-	//chprintf((BaseSequentialStream *)&SD3, "%f %d;\r\n",frequency, color);
+		color = (A*frequency+B);
+//	chprintf((BaseSequentialStream *)&SD3, "%f %f %f %f;\r\n",frequency, color, A, B);
 	return color;
 
 }
@@ -109,7 +109,7 @@ int main(void)
     //starts the USB communication
     usb_start();
     //starts timer 12
-    timer12_start();
+   // timer12_start();
     //inits the motors
     motors_init();
     // init message bus
@@ -168,19 +168,19 @@ int main(void)
         	//on passe du rouge au rose
         	clear_leds();
         	toggle_rgb_led(LED6, RED_LED, MAX_COLOR);
-        	toggle_rgb_led(LED4, BLUE_LED, color);
+        	toggle_rgb_led(LED6, BLUE_LED, color);
         }
         else if(state == FRONT_RIGHT){
         	//on passe bleu foncé au bleu clair
         	clear_leds();
         	toggle_rgb_led(LED8, BLUE_LED, MAX_COLOR);
-        	toggle_rgb_led(LED4, RED_LED, color);
+        	toggle_rgb_led(LED8, RED_LED, color);
         }
         else if(state == FRONT_LEFT){
         	//on passe du rouge au jaune
         	clear_leds();
         	toggle_rgb_led(LED2, RED_LED, MAX_COLOR);
-        	toggle_rgb_led(LED4, GREEN_LED, color);
+        	toggle_rgb_led(LED2, GREEN_LED, color);
         }
         else
         	clear_leds();

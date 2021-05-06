@@ -18,12 +18,16 @@ uint8_t get_stop(void)
 static THD_WORKING_AREA(distance_thd_wa, 256);
 static THD_FUNCTION(distance_thd, arg)
 {
-	//systime_t time;
+	(void) arg;
+	chRegSetThreadName(__FUNCTION__);
+
+	systime_t time;
+	calibrate_ir();
 	while(1)
 	{
-		//time = chVTGetSystemTime();
+		time = chVTGetSystemTime();
 		find_distance();
-		//chThdSleepUntilWindowed(time, time + MS2ST(10)); //reduced the sample rate to 100Hz
+		chThdSleepUntilWindowed(time, time+MS2ST(10));
 	}
 }
 
@@ -41,14 +45,13 @@ void distance_start(void)
 void find_distance(void)
 {
 	int d_FR_17, d_FR_49, d_R, d_BR, d_BL, d_L, d_FL_49, d_FL_17;
-	calibrate_ir();
 
 	d_FR_17 = get_prox(FR_17); //ir sensor front right 17 degrees
 	d_FR_49 = get_prox(FR_49);
 	d_FL_17 = get_prox(FL_17);
 	d_FL_49 = get_prox(FL_49);
 
-//	chprintf((BaseSequentialStream *)&SD3, "d_FR_17=%d, d_FR_49=%d, d_FL_17=%d, d_FL_49=%d\n", d_FR_17, d_FR_49, d_FL_17, d_FL_49);
+//	chprintf((BaseSequentialStream *)&SD3, "%d %d %d %d;\r\n", d_FR_17, d_FR_49, d_FL_17, d_FL_49);
 
 	if(d_FR_17>=THRESHOLD_DIST || d_FR_49>=THRESHOLD_DIST || d_FL_17>=THRESHOLD_DIST || d_FL_49>=THRESHOLD_DIST)
 	{
