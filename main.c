@@ -13,6 +13,7 @@
 #include <sensors/proximity.h>
 
 #include <audio_processing.h>
+#include <pid.h>
 #include <fft.h>
 #include <distance.h>
 #include <communications.h>
@@ -20,6 +21,20 @@
 #include <spi_comm.h>
 #include <leds.h>
 
+//PID parameters
+#define Kp				0.055
+#define Ki				0
+#define Kd				0
+#define THRESHOLD		10000
+
+//define color parameters
+#define MAX_COLOR		255
+#define MIN_COLOR		0
+//define audible frequency parameters
+#define MIN_FREQU		300
+#define MAX_FREQU		700
+#define A				MAX_COLOR/(MAX_FREQU-MIN_FREQU)
+#define B				-MAX_COLOR/(MAX_FREQU-MIN_FREQU)*MIN_FREQU
 //uncomment to use the microphones
 #define USE_MIC
 
@@ -62,6 +77,26 @@ static void timer12_start(void){
     gptStartContinuous(&GPTD12, 0xFFFF);
 }
 
+/*
+*	params :
+*	float frequency: it takes the frequency calculated previously or any other parameter
+*	return a color
+*/
+uint8_t color_convertion(float frequency)
+{
+	//frequency between 2 kHz and 5 kHz -> audible
+	uint8_t color = 0;
+	if(frequency >= MAX_FREQU)
+		color = MAX_COLOR;
+	else if(frequency <= MIN_FREQU)
+		color = MIN_COLOR;
+	else
+		color = (uint8_t)(A*frequency+B);
+	//chprintf((BaseSequentialStream *)&SD3, "%f %d;\r\n",frequency, color);
+	return color;
+
+}
+
 int main(void)
 {
 
@@ -85,6 +120,8 @@ int main(void)
     distance_start();
     //start spi for leds
     spi_comm_start();
+    //init pid_parameter Kp, Ki, Kd, THRESHOLD
+    set_pid_param(Kp, Ki, Kd, THRESHOLD);
 
     //temp tab used to store values in complex_float format
     //needed bx doFFT_c
@@ -119,24 +156,31 @@ int main(void)
         	right_motor_set_speed(get_speed_right());
         }
 
-        // set leds to indicate the direction the sound is coming from
+        // commande aux leds
+        uint8_t color = color_convertion(get_frequency());
         if(state == BACK_RIGHT){
+        	//on passe du vert au jaune
         	clear_leds();
-        	toggle_rgb_led(LED4, GREEN_LED, 255);
+        	toggle_rgb_led(LED4, GREEN_LED, MAX_COLOR);
+        	toggle_rgb_led(LED4, RED_LED, color);
         }
         else if(state == BACK_LEFT){
+        	//on passe du rouge au rose
         	clear_leds();
-        	toggle_rgb_led(LED6, RED_LED, 255);
+        	toggle_rgb_led(LED6, RED_LED, MAX_COLOR);
+        	toggle_rgb_led(LED4, BLUE_LED, color);
         }
         else if(state == FRONT_RIGHT){
+        	//on passe bleu foncé au bleu clair
         	clear_leds();
-        	toggle_rgb_led(LED8, RED_LED, 255);
-        	toggle_rgb_led(LED8, GREEN_LED, 255);
+        	toggle_rgb_led(LED8, BLUE_LED, MAX_COLOR);
+        	toggle_rgb_led(LED4, RED_LED, color);
         }
         else if(state == FRONT_LEFT){
+        	//on passe du rouge au jaune
         	clear_leds();
-        	toggle_rgb_led(LED2, RED_LED, 255);
-        	toggle_rgb_led(LED2, BLUE_LED, 255);
+        	toggle_rgb_led(LED2, RED_LED, MAX_COLOR);
+        	toggle_rgb_led(LED4, GREEN_LED, color);
         }
         else
         	clear_leds();

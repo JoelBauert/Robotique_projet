@@ -7,19 +7,38 @@
 #include <pid.h>
 #include <math.h>
 
-static float Kp, Ki, Kd;
+typedef struct
+{
+	float error;
+	float integral;
+	float derivate;
+} PID_obj;
 
-void get_pid_param(float kp, float ki, float kd)
+static float Kp, Ki, Kd, threshold;
+/*
+*	set the parameters needed to compute a pid regulator
+*	params :				kp, ki, kd, threshold
+*/
+void set_pid_param(float kp, float ki, float kd, float Threshold)
 {
 	Kp = kp;
 	Ki = ki;
 	Kd = kd;
+	threshold = Threshold;
 }
-
-float calcul_pid(float val1, float val2, float threshold, float max)
+/*
+*	compute a pid regulator
+*	params :
+*	val1: value that we mesure
+*	val2: value to reach
+*	max:  limit for the integrator
+*
+*	output: output_regulated
+*/
+float calcul_pid(float val1, float val2, float max)
 {
 	PID_obj pid;
-	float speed;
+	float output_regulated;
 	static float integral = 0;
 	static float previous_error = 0;
 
@@ -28,8 +47,8 @@ float calcul_pid(float val1, float val2, float threshold, float max)
 	if(fabs(error) <= threshold)
 	{
 		integral = 0;
-		speed = 0;
-		return speed;
+		output_regulated = 0;
+		return output_regulated;
 	}
 	pid.error = error;
 
@@ -44,8 +63,8 @@ float calcul_pid(float val1, float val2, float threshold, float max)
 	pid.derivate = error-previous_error;
 
 
-	speed = Kp*pid.error + Ki*pid.integral + Kd*pid.derivate;
+	output_regulated = Kp*pid.error + Ki*pid.integral + Kd*pid.derivate;
 
-	return speed;
+	return output_regulated;
 }
 

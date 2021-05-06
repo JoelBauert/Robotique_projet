@@ -44,15 +44,16 @@ static float micBack_output[FFT_SIZE];
 #define FREQ_BACKWARD_L		(FREQ_BACKWARD-1)
 #define FREQ_BACKWARD_H		(FREQ_BACKWARD+1)
 
-#define Kp				1
-#define Ki				0
-#define Kd				0
-#define THRESHOLD		10000 //minimum amplitude difference for the pid to recognize and set an error term
+//parameter to find the frequency with the index position
+#define B					150
+#define A					150/512
+
 
 //speed and state variables for motor controls
 static float speed_R;
 static float speed_L;
 static uint8_t state;
+static float frequency;
 
 /*
  * functions to pass the variables to main
@@ -71,7 +72,11 @@ uint8_t get_state(void)
 	return state;
 }
 
-
+float get_frequency(void)
+{
+	frequency = B-abs(frequency)*A;
+	return frequency;
+}
 
 /*
 *	Simple function used to detect the highest value in a buffer
@@ -79,13 +84,13 @@ uint8_t get_state(void)
 
 float sound_remote(float* data){
 	float max_norm = MIN_VALUE_THRESHOLD;
-	int16_t max_norm_index = -1;
+//	int16_t max_norm_index = -1;
 
 	//search for the highest peak
 	for(uint16_t i = MIN_FREQ ; i <= MAX_FREQ ; i++){
 		if(data[i] > max_norm){
 			max_norm = data[i];
-			max_norm_index = i;
+			frequency = i; //position detected but not the real frequency
 		}
 	}
 	return max_norm;
@@ -101,34 +106,65 @@ float sound_remote(float* data){
 
 void find_sound(float micro0, float micro1, float micro2)
 {
-	if(micro2 > micro1 && micro2 > micro0 && micro0 > micro1){ // back right
+	//graphe index
+	static uint16_t i = 0;
+	i++;
+	chprintf((BaseSequentialStream *)&SD3, "%f %f %f %d ", micro2, micro1, micro0, i);
+	//if(micro2 > micro1 && micro2 > micro0 && micro0 > micro1){ // back right
+	if(micro2 > micro1){ //arrière droite
+		if(micro2 > micro0){
+			if(micro1 > micro0){
+				// turn left
+				speed_L = -MOTOR_SPEED_LIMIT;
+				speed_R = MOTOR_SPEED_LIMIT;
+				chprintf((BaseSequentialStream *)&SD3, "%f %f;\r\n",speed_L, speed_R);
+				state = BACK_LEFT;
+				return;
+			}
+		}
 		// turn right
 		speed_L = MOTOR_SPEED_LIMIT;
 		speed_R = -MOTOR_SPEED_LIMIT;
+		chprintf((BaseSequentialStream *)&SD3, "%f %f;\r\n",speed_L, speed_R);
 		state = BACK_RIGHT;
 		return;
 	}
-	if(micro2 > micro1 && micro2 > micro0 && micro1 > micro0){ // back left
+	//if(micro2 > micro1 && micro2 > micro0 && micro1 > micro0){ // back left
+	else if(micro2 > micro0){
 		// turn left
 		speed_L = -MOTOR_SPEED_LIMIT;
 		speed_R = MOTOR_SPEED_LIMIT;
+		chprintf((BaseSequentialStream *)&SD3, "%f %f;\r\n",speed_L, speed_R);
 		state = BACK_LEFT;
 		return;
 	}
-
-	float speed = 0;
-	if(micro1 > micro2 && micro0 > micro2){ // front right or left
-		if(micro1 > micro0)
-			state = FRONT_RIGHT;
-		else
-			state = FRONT_LEFT;
-
+	else if(micro1 > micro2 && micro0 > micro2){ // front right or left
+		float speed = 0;
 		// if micro1 > micro0 -> error = micro1-micro0 > 0 -> turn left
 		// if micro1 < micro0 -> error = micro1-micro0 < 0 -> turn right
-		get_pid_param(Kp, Ki, Kd);
-		speed = calcul_pid(micro1, micro0, THRESHOLD, MOTOR_SPEED_LIMIT);
+		if(micro1 > micro0) //devant droit
+			state = FRONT_RIGHT;
+		else //devant gauche
+			state = FRONT_LEFT;
+
+		speed = calcul_pid(micro1, micro0, MOTOR_SPEED_LIMIT);
 		speed_L = 550-speed;
 		speed_R = 550+speed;
+
+		if(speed_L > MOTOR_SPEED_LIMIT){
+			speed_L = MOTOR_SPEED_LIMIT;
+		}
+		else if(speed_L < -MOTOR_SPEED_LIMIT){
+				speed_L = -MOTOR_SPEED_LIMIT;
+		}
+
+		if(speed_R > MOTOR_SPEED_LIMIT){
+			speed_R = MOTOR_SPEED_LIMIT;
+		}
+		else if(speed_R < -MOTOR_SPEED_LIMIT){
+			speed_R = -MOTOR_SPEED_LIMIT;
+		}
+		chprintf((BaseSequentialStream *)&SD3, "%f %f\r\n",speed_L, speed_R);
 	}
 }
 /*
