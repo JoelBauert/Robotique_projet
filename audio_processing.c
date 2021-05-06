@@ -29,31 +29,14 @@ static float micBack_output[FFT_SIZE];
 #define MIN_VALUE_THRESHOLD	10000
 
 #define MIN_FREQ		20	//we don't analyze before this index to not use resources for nothing
-//#define FREQ_FORWARD	16	//250Hz
-//#define FREQ_LEFT		19	//296Hz
-//#define FREQ_RIGHT		23	//359HZ
-//#define FREQ_BACKWARD	26	//406Hz
 #define MAX_FREQ		40	//we don't analyze after this index to not use resources for nothing
-
-#define FREQ_FORWARD_L		(FREQ_FORWARD-1)
-#define FREQ_FORWARD_H		(FREQ_FORWARD+1)
-#define FREQ_LEFT_L			(FREQ_LEFT-1)
-#define FREQ_LEFT_H			(FREQ_LEFT+1)
-#define FREQ_RIGHT_L		(FREQ_RIGHT-1)
-#define FREQ_RIGHT_H		(FREQ_RIGHT+1)
-#define FREQ_BACKWARD_L		(FREQ_BACKWARD-1)
-#define FREQ_BACKWARD_H		(FREQ_BACKWARD+1)
-
-//parameter to find the frequency with the index position
-#define B					150
-#define A					(150./512)
 
 
 //speed and state variables for motor controls
 static float speed_R;
 static float speed_L;
 static uint8_t state;
-static float frequency;
+static uint16_t frequency;
 
 /*
  * functions to pass the variables to main
@@ -72,9 +55,8 @@ uint8_t get_state(void)
 	return state;
 }
 
-float get_frequency(void)
+uint16_t get_frequency(void)
 {
-	//frequency = B-abs(frequency)*A;
 	return frequency;
 }
 
@@ -84,7 +66,6 @@ float get_frequency(void)
 
 float sound_remote(float* data){
 	float max_norm = MIN_VALUE_THRESHOLD;
-//	int16_t max_norm_index = -1;
 
 	//search for the highest peak
 	for(uint16_t i = MIN_FREQ ; i <= MAX_FREQ ; i++){
@@ -184,7 +165,7 @@ void processAudioData(int16_t *data, uint16_t num_samples){
 	*
 	*	We get 160 samples per mic every 10ms
 	*	So we fill the samples buffers to reach
-	*	1024 samples, then we compute the FFTs.
+	*	1024 samples, then we compute the FFTs (only for the 3 mics we use: to minimize time spent in the loop)
 	*
 	*/
 

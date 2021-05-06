@@ -28,7 +28,7 @@ typedef enum {
 float get_speed_right(void);
 float get_speed_left(void);
 uint8_t get_state(void);
-float get_frequency(void);
+uint16_t get_frequency(void);
 
 void find_sound(float micro0, float micro1, float micro2);
 

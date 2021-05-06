@@ -21,12 +21,6 @@
 #include <spi_comm.h>
 #include <leds.h>
 
-//PID parameters
-#define Kp				0.055
-#define Ki				0.01
-#define Kd				0
-#define THRESHOLD		10000
-
 //define color parameters
 #define MAX_COLOR		255
 #define MIN_COLOR		0
@@ -80,7 +74,7 @@ static void timer12_start(void){
 *	float frequency: it takes the frequency calculated previously or any other parameter
 *	return a color
 */
-uint8_t color_convertion(float frequency)
+uint8_t color_convertion(uint16_t frequency)
 {
 	//frequency between 2 kHz and 5 kHz -> audible
 	float color = 0;
@@ -92,7 +86,6 @@ uint8_t color_convertion(float frequency)
 		color = MIN_COLOR;
 	else
 		color = (A*frequency+B);
-//	chprintf((BaseSequentialStream *)&SD3, "%f %f %f %f;\r\n",frequency, color, A, B);
 	return color;
 
 }
@@ -120,12 +113,13 @@ int main(void)
     distance_start();
     //start spi for leds
     spi_comm_start();
+
     //init pid_parameter Kp, Ki, Kd, THRESHOLD
-    set_pid_param(Kp, Ki, Kd, THRESHOLD);
+    set_pid_param(0.055, 0.01, 0, 10000);
 
     //temp tab used to store values in complex_float format
     //needed bx doFFT_c
-    static complex_float temp_tab[FFT_SIZE];
+//    static complex_float temp_tab[FFT_SIZE];
     //send_tab is used to save the state of the buffer to send (double buffering)
     //to avoid modifications of the buffer while sending it
     static float send_tab[FFT_SIZE];
