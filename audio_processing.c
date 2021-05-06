@@ -101,7 +101,7 @@ void find_sound(float micro0, float micro1, float micro2)
 				// turn left
 				speed_L = -MOTOR_SPEED_LIMIT;
 				speed_R = MOTOR_SPEED_LIMIT;
-				chprintf((BaseSequentialStream *)&SD3, "%f %f\r\n",speed_L, speed_R);
+				chprintf((BaseSequentialStream *)&SD3, "%f %f;\r\n",speed_L, speed_R);
 				state = BACK_LEFT;
 				return;
 			}
@@ -109,7 +109,7 @@ void find_sound(float micro0, float micro1, float micro2)
 		// turn right
 		speed_L = MOTOR_SPEED_LIMIT;
 		speed_R = -MOTOR_SPEED_LIMIT;
-		chprintf((BaseSequentialStream *)&SD3, "%f %f\r\n",speed_L, speed_R);
+		chprintf((BaseSequentialStream *)&SD3, "%f %f;\r\n",speed_L, speed_R);
 		state = BACK_RIGHT;
 		return;
 	}
@@ -118,7 +118,7 @@ void find_sound(float micro0, float micro1, float micro2)
 		// turn left
 		speed_L = -MOTOR_SPEED_LIMIT;
 		speed_R = MOTOR_SPEED_LIMIT;
-		chprintf((BaseSequentialStream *)&SD3, "%f %f\r\n",speed_L, speed_R);
+		chprintf((BaseSequentialStream *)&SD3, "%f %f;\r\n",speed_L, speed_R);
 		state = BACK_LEFT;
 		return;
 	}

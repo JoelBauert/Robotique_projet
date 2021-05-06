@@ -91,6 +91,7 @@ uint8_t color_convertion(float frequency)
 		color = MIN_COLOR;
 	else
 		color = (uint8_t)(A*frequency+B);
+	//chprintf((BaseSequentialStream *)&SD3, "%f %d;\r\n",frequency, color);
 	return color;
 
 }
