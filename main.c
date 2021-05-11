@@ -21,6 +21,11 @@
 #include <spi_comm.h>
 #include <leds.h>
 
+//define PID parameters
+#define Kp				0.055
+#define Ki				0.001
+#define Kd				0
+#define THRESHOLD		10000
 //define color parameters
 #define MAX_COLOR		255
 #define MIN_COLOR		0
@@ -96,7 +101,7 @@ int main(void)
     spi_comm_start();
 
     //init pid_parameter Kp, Ki, Kd, THRESHOLD
-    set_pid_param(0.055, 0.001, 0, 10000);
+    set_pid_param(Kp, Ki, Kd, THRESHOLD);
 
     //send_tab is used to save the state of the buffer to send (double buffering)
     //to avoid modifications of the buffer while sending it
