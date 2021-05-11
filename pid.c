@@ -16,6 +16,7 @@ typedef struct
 
 static float Kp, Ki, Kd, threshold;
 /*
+ *  @brief: initialize the parameters in the module
 *	set the parameters needed to compute a pid regulator
 *	params :				kp, ki, kd, threshold
 */
@@ -27,7 +28,7 @@ void set_pid_param(float kp, float ki, float kd, float Threshold)
 	threshold = Threshold;
 }
 /*
-*	compute a pid regulator
+*	@ brief: compute a pid regulator
 *	params :
 *	val1: value that we mesure
 *	val2: value to reach

@@ -7,6 +7,17 @@
 #include <usbcfg.h>
 #include <chprintf.h>
 
+#define FR_17 0 // front right 17'
+#define FR_49 1 // front right 49'
+#define RIGHT 2 // right
+#define BR    3 // back right
+#define BL    4 // back left
+#define LEFT  5 // left
+#define FL_49 6 // front left 49'
+#define FL_17 7 // front right 17'
+
+#define THRESHOLD_DIST 200 //distance at which the e-puck should stop
+
 static uint8_t stop; //boolean value to signal that an obstacle is close
 
 uint8_t get_stop(void)
@@ -27,12 +38,12 @@ static THD_FUNCTION(distance_thd, arg)
 	{
 		time = chVTGetSystemTime();
 		find_distance();
-		chThdSleepUntilWindowed(time, time+MS2ST(10));
+		chThdSleepUntilWindowed(time, time+MS2ST(10)); //reduced the sample rate to 100Hz
 	}
 }
 
 /*
- * function initializing the thread
+ * @brief: function initializing the thread
  */
 void distance_start(void)
 {
@@ -40,26 +51,19 @@ void distance_start(void)
 }
 
 /*
- * function to check the 4 front facing proximity sensors and set the stop boolean if the e-puck is close to an obstacle
+ * @brief: function to check the 4 front facing proximity sensors and set the stop boolean if the e-puck is close to an obstacle
  */
 void find_distance(void)
 {
-	int d_FR_17, d_FR_49, d_R, d_BR, d_BL, d_L, d_FL_49, d_FL_17;
+	int d_FR_17, d_FR_49, d_FL_49, d_FL_17;
 
-	d_FR_17 = get_prox(FR_17); //ir sensor front right 17 degrees
+	d_FR_17 = get_prox(FR_17);
 	d_FR_49 = get_prox(FR_49);
 	d_FL_17 = get_prox(FL_17);
 	d_FL_49 = get_prox(FL_49);
 
-//	chprintf((BaseSequentialStream *)&SD3, "%d %d %d %d;\r\n", d_FR_17, d_FR_49, d_FL_17, d_FL_49);
-
 	if(d_FR_17>=THRESHOLD_DIST || d_FR_49>=THRESHOLD_DIST || d_FL_17>=THRESHOLD_DIST || d_FL_49>=THRESHOLD_DIST)
-	{
 		stop = true;
-	}
 	else
-	{
 		stop = false;
-	}
-
 }

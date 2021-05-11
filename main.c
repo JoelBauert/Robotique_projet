@@ -53,30 +53,14 @@ static void serial_start(void)
 	sdStart(&SD3, &ser_cfg); // UART3.
 }
 
-static void timer12_start(void){
-    //General Purpose Timer configuration   
-    //timer 12 is a 16 bit timer so we can measure time
-    //to about 65ms with a 1Mhz counter
-    static const GPTConfig gpt12cfg = {
-        1000000,        /* 1MHz timer clock in order to measure uS.*/
-        NULL,           /* Timer callback.*/
-        0,
-        0
-    };
-
-    gptStart(&GPTD12, &gpt12cfg);
-    //let the timer count to max value
-    gptStartContinuous(&GPTD12, 0xFFFF);
-}
-
 /*
+ *  @brief: the function takes a frequency and converts into a color
 *	params :
 *	float frequency: it takes the frequency calculated previously or any other parameter
 *	return a color
 */
 uint8_t color_convertion(uint16_t frequency)
 {
-	//frequency between 2 kHz and 5 kHz -> audible
 	float color = 0;
 	float A = (float)MAX_COLOR/(MAX_FREQU-MIN_FREQU);
 	float B = -(float)MAX_COLOR/(MAX_FREQU-MIN_FREQU)*MIN_FREQU;
@@ -92,7 +76,6 @@ uint8_t color_convertion(uint16_t frequency)
 
 int main(void)
 {
-
     halInit();
     chSysInit();
     mpu_init();
@@ -101,8 +84,6 @@ int main(void)
     serial_start();
     //starts the USB communication
     usb_start();
-    //starts timer 12
-   // timer12_start();
     //inits the motors
     motors_init();
     // init message bus
@@ -117,9 +98,6 @@ int main(void)
     //init pid_parameter Kp, Ki, Kd, THRESHOLD
     set_pid_param(0.055, 0.001, 0, 10000);
 
-    //temp tab used to store values in complex_float format
-    //needed bx doFFT_c
-//    static complex_float temp_tab[FFT_SIZE];
     //send_tab is used to save the state of the buffer to send (double buffering)
     //to avoid modifications of the buffer while sending it
     static float send_tab[FFT_SIZE];
@@ -138,9 +116,9 @@ int main(void)
         //waits until a result must be sent to the computer
         wait_send_to_computer();
 #else
-        // moteur controls
+        /* moteur controls */
         int state = get_state();
-        //if we are close to an obstacle: moving forward is not permissible, but turning around is
+        //if we are close to an obstacle: moving forward is not permissible, but turning around is permissible
         if(get_stop() && (state == FRONT_LEFT || state == FRONT_RIGHT)){
 			left_motor_set_speed(0);
 			right_motor_set_speed(0);
@@ -150,7 +128,7 @@ int main(void)
         	right_motor_set_speed(get_speed_right());
         }
 
-        // commande aux leds
+        /* commande aux leds */
         uint8_t color = color_convertion(get_frequency());
         if(state == BACK_RIGHT){
         	//on passe du vert au jaune
@@ -189,6 +167,9 @@ int main(void)
         SendFloatToComputer((BaseSequentialStream *) &SD3, get_audio_buffer_ptr(LEFT_OUTPUT), FFT_SIZE);
 #endif  /* DOUBLE_BUFFERING */
 #else
+        //temp tab used to store values in complex_float format
+        //needed bx doFFT_c
+        static complex_float temp_tab[FFT_SIZE];
         //time measurement variables
         volatile uint16_t time_fft = 0;
         volatile uint16_t time_mag  = 0;

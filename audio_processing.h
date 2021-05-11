@@ -22,9 +22,6 @@ typedef enum {
 	BACK_OUTPUT
 } BUFFER_NAME_t;
 
-//éventuellement le mettre dans un fichier à part
-
-
 float get_speed_right(void);
 float get_speed_left(void);
 uint8_t get_state(void);

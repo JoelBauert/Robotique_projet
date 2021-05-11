@@ -90,15 +90,13 @@ void find_sound(float micro0, float micro1, float micro2)
 	//graphe index
 	static uint16_t i = 0;
 	i++;
-//	chprintf((BaseSequentialStream *)&SD3, "%f %f %f %d ", micro2, micro1, micro0, i);
-	//if(micro2 > micro1 && micro2 > micro0 && micro0 > micro1){ // back right
+
 	if(micro2 > micro1){ //arrière droite
 		if(micro2 > micro0){
 			if(micro1 > micro0){
 				// turn left
 				speed_L = -MOTOR_SPEED_LIMIT;
 				speed_R = MOTOR_SPEED_LIMIT;
-//				chprintf((BaseSequentialStream *)&SD3, "%f %f;\r\n",speed_L, speed_R);
 				state = BACK_LEFT;
 				return;
 			}
@@ -106,16 +104,13 @@ void find_sound(float micro0, float micro1, float micro2)
 		// turn right
 		speed_L = MOTOR_SPEED_LIMIT;
 		speed_R = -MOTOR_SPEED_LIMIT;
-//		chprintf((BaseSequentialStream *)&SD3, "%f %f;\r\n",speed_L, speed_R);
 		state = BACK_RIGHT;
 		return;
 	}
-	//if(micro2 > micro1 && micro2 > micro0 && micro1 > micro0){ // back left
 	else if(micro2 > micro0){
 		// turn left
 		speed_L = -MOTOR_SPEED_LIMIT;
 		speed_R = MOTOR_SPEED_LIMIT;
-//		chprintf((BaseSequentialStream *)&SD3, "%f %f;\r\n",speed_L, speed_R);
 		state = BACK_LEFT;
 		return;
 	}
@@ -146,7 +141,6 @@ void find_sound(float micro0, float micro1, float micro2)
 		else if(speed_R < -MOTOR_SPEED_LIMIT){
 			speed_R = -MOTOR_SPEED_LIMIT;
 		}
-//		chprintf((BaseSequentialStream *)&SD3, "%f %f;\r\n",speed_L, speed_R);
 	}
 }
 /*
@@ -159,7 +153,6 @@ void find_sound(float micro0, float micro1, float micro2)
 *							so we have [micRight1, micLeft1, micBack1, micFront1, micRight2, etc...]
 *	uint16_t num_samples	Tells how many data we get in total (should always be 640)
 */
-
 void processAudioData(int16_t *data, uint16_t num_samples){
 
 	/*
