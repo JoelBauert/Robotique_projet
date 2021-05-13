@@ -30,8 +30,8 @@
 #define MAX_COLOR		255
 #define MIN_COLOR		0
 //define audible frequency parameters
-#define MIN_FREQU		22
-#define MAX_FREQU		38
+#define MIN_FREQU		22 // 343 Hz
+#define MAX_FREQU		38 // 593 Hz
 //uncomment to use the microphones
 #define USE_MIC
 
@@ -59,22 +59,22 @@ static void serial_start(void)
 }
 
 /*
- *  @brief: the function takes a frequency and converts into a color
+ *  @brief: the function takes an index that is proportional to the frequency and converts into a color
 *	params :
-*	float frequency: it takes the frequency calculated previously or any other parameter
+*	float frequency: it takes the index of frequency calculated previously or any other parameter
 *	return a color
 */
-uint8_t color_convertion(uint16_t frequency)
+uint8_t color_convertion(uint16_t index_frequency)
 {
 	float color = 0;
 	float A = (float)MAX_COLOR/(MAX_FREQU-MIN_FREQU);
 	float B = -(float)MAX_COLOR/(MAX_FREQU-MIN_FREQU)*MIN_FREQU;
-	if(frequency >= MAX_FREQU)
+	if(index_frequency >= MAX_FREQU)
 		color = MAX_COLOR;
-	else if(frequency <= MIN_FREQU)
+	else if(index_frequency <= MIN_FREQU)
 		color = MIN_COLOR;
 	else
-		color = (A*frequency+B);
+		color = (A*index_frequency+B);
 	return color;
 
 }
