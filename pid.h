@@ -2,7 +2,7 @@
  * pid.h
  *
  *  Created on: 27 avr. 2021
- *      Author: jessica
+ *      Author: Jessica, Joel
  */
 
 #ifndef PID_H_

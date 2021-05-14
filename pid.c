@@ -2,7 +2,7 @@
  * pid.c
  *
  *  Created on: 27 avr. 2021
- *      Author: jessica
+ *      Author: Jessica, Joel
  */
 #include <pid.h>
 #include <math.h>
@@ -53,7 +53,7 @@ float calcul_pid(float val1, float val2, float max)
 	}
 	pid.error = error;
 
-	if(Ki){
+	if(Ki){ // don't divide max by 0
 		integral += error;
 		max = max/Ki;
 		if(integral > max){

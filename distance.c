@@ -1,3 +1,9 @@
+/*
+ * distance.c
+ *
+ *  Created on: 22 avr. 2021
+ *      Author: Jessica, Joel
+ */
 #include <main.h>
 #include <distance.h>
 #include <sensors/proximity.h>

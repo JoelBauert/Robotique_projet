@@ -32,7 +32,7 @@ static float micBack_output[FFT_SIZE];
 #define MAX_FREQ		40	//we don't analyze after this index to not use resources for nothing
 
 
-//speed and state variables for motor controls
+//speed and state variables for motor and LED controls
 static float speed_R;
 static float speed_L;
 static uint8_t state;
@@ -41,7 +41,6 @@ static uint16_t frequency;
 /*
  * functions to pass the variables to main
  */
-
 float get_speed_right(void)
 {
 	return speed_R;
@@ -63,7 +62,6 @@ uint16_t get_frequency(void)
 /*
 *	Simple function used to detect the highest value in a buffer
 */
-
 float sound_remote(float* data){
 	float max_norm = MIN_VALUE_THRESHOLD;
 
@@ -71,7 +69,7 @@ float sound_remote(float* data){
 	for(uint16_t i = MIN_FREQ ; i <= MAX_FREQ ; i++){
 		if(data[i] > max_norm){
 			max_norm = data[i];
-			frequency = i; //position detected but not the real frequency
+			frequency = i; //position detected, i is a direct function of the frequency
 		}
 	}
 	return max_norm;
@@ -84,16 +82,15 @@ float sound_remote(float* data){
  *	parameters:
  *	micro0-2			magnitudes of the three microphone signals
  */
-
 void find_sound(float micro0, float micro1, float micro2)
 {
-	//graphe index
+	//graph index
 	static uint16_t i = 0;
 	i++;
 
-	if(micro2 > micro1){ //arrière droite
-		if(micro2 > micro0){
-			if(micro1 > micro0){
+	if(micro2 > micro1){ //back right (maybe left)
+		if(micro2 > micro0){ //further back right (maybe left)
+			if(micro1 > micro0){ //back left
 				// turn left
 				speed_L = -MOTOR_SPEED_LIMIT;
 				speed_R = MOTOR_SPEED_LIMIT;
@@ -107,20 +104,20 @@ void find_sound(float micro0, float micro1, float micro2)
 		state = BACK_RIGHT;
 		return;
 	}
-	else if(micro2 > micro0){
+	else if(micro2 > micro0){ //back left
 		// turn left
 		speed_L = -MOTOR_SPEED_LIMIT;
 		speed_R = MOTOR_SPEED_LIMIT;
 		state = BACK_LEFT;
 		return;
 	}
-	else if(micro1 > micro2 && micro0 > micro2){ // front right or left
+	else if(micro1 > micro2 && micro0 > micro2){ // front right or left: PI controlled
 		float speed = 0;
 		// if micro1 > micro0 -> error = micro1-micro0 > 0 -> turn left
 		// if micro1 < micro0 -> error = micro1-micro0 < 0 -> turn right
-		if(micro1 > micro0) //devant droit
+		if(micro1 > micro0)
 			state = FRONT_RIGHT;
-		else //devant gauche
+		else
 			state = FRONT_LEFT;
 
 		// go forward with directional bias
@@ -128,7 +125,7 @@ void find_sound(float micro0, float micro1, float micro2)
 		speed_L = 550-speed;
 		speed_R = 550+speed;
 
-		//Securite pour les moteurs
+		// motor limit security
 		if(speed_L > MOTOR_SPEED_LIMIT){
 			speed_L = MOTOR_SPEED_LIMIT;
 		}
