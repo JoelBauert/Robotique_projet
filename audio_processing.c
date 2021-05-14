@@ -95,10 +95,10 @@ void find_sound(float micro0, float micro1, float micro2)
 	alpha0 = atan(micRight_cmplx_input[frequency+1]/micRight_cmplx_input[frequency]);
 	if(micRight_cmplx_input[frequency]<0)
 		alpha0 += 180;
-	alpha1 = atan(micLeft_cmplx_input[frequency+1]/micRight_cmplx_input[frequency]);
+	alpha1 = atan(micLeft_cmplx_input[frequency+1]/micLeft_cmplx_input[frequency]);
 	if(micLeft_cmplx_input[frequency]<0)
 			alpha1 += 180;
-	alpha2 = atan(micBack_cmplx_input[frequency+1]/micRight_cmplx_input[frequency]);
+	alpha2 = atan(micBack_cmplx_input[frequency+1]/micBack_cmplx_input[frequency]);
 	if(micBack_cmplx_input[frequency]<0)
 			alpha2 += 180;
 
