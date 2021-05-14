@@ -102,8 +102,8 @@ void find_sound(float micro0, float micro1, float micro2)
 	if(micBack_cmplx_input[frequency]<0)
 			alpha2 += 180;
 
-	if((micro2 > micro1) && (alpha2 < alpha1)){ //arrière droite
-		if((micro2 > micro0) && (alpha2 < alpha0)){
+	if(/*(micro2 > micro1) &&*/ (alpha2 < alpha1)){ //arrière droite
+		if(/*(micro2 > micro0) &&*/ (alpha2 < alpha0)){
 			if(micro1 > micro0){
 				// turn left
 				speed_L = -MOTOR_SPEED_LIMIT;
@@ -118,18 +118,18 @@ void find_sound(float micro0, float micro1, float micro2)
 		state = BACK_RIGHT;
 		return;
 	}
-	else if((micro2 > micro0) && (alpha2 < alpha0)){
+	else if(/*(micro2 > micro0) &&*/ (alpha2 < alpha0)){
 		// turn left
 		speed_L = -MOTOR_SPEED_LIMIT;
 		speed_R = MOTOR_SPEED_LIMIT;
 		state = BACK_LEFT;
 		return;
 	}
-	else if((micro1 > micro2 && micro0 > micro2) && (alpha1 < alpha2 && alpha0 < alpha2)){ // front right or left
+	else if(/*(micro1 > micro2 && micro0 > micro2) &&*/ (alpha1 < alpha2 && alpha0 < alpha2)){ // front right or left
 		float speed = 0;
 		// if micro1 > micro0 -> error = micro1-micro0 > 0 -> turn left
 		// if micro1 < micro0 -> error = micro1-micro0 < 0 -> turn right
-		if((micro1 > micro0) && (alpha1 < alpha0)) //devant droit
+		if(/*(micro1 > micro0) &&*/ (alpha1 < alpha0)) //devant droit
 			state = FRONT_RIGHT;
 		else //devant gauche
 			state = FRONT_LEFT;
