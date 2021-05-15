@@ -30,7 +30,7 @@ void set_pid_param(float kp, float ki, float kd, float Threshold)
 /*
 *	@ brief: compute a pid regulator
 *	params :
-*	val1: value that we mesure
+*	val1: value that we measure
 *	val2: value to reach
 *	max:  limit for the integrator
 *

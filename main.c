@@ -21,7 +21,7 @@
 #include <spi_comm.h>
 #include <leds.h>
 
-//define PID parameters
+//define PID parameters - empirically determined by testing
 #define Kp				0.055
 #define Ki				0.001
 #define Kd				0
@@ -61,7 +61,7 @@ static void serial_start(void)
 /*
  *  @brief: the function takes an index that is proportional to the frequency and converts into a color
 *	params :
-*	float frequency: it takes the index of frequency calculated previously or any other parameter
+*	uint16_t index_frequency: it takes the index of frequency calculated previously or any other parameter
 *	return a color
 */
 uint8_t color_convertion(uint16_t index_frequency)

@@ -26,7 +26,7 @@ static float micRight_output[FFT_SIZE];
 static float micFront_output[FFT_SIZE];
 static float micBack_output[FFT_SIZE];
 
-#define MIN_VALUE_THRESHOLD	10000
+#define MIN_VALUE_THRESHOLD	10000 //maximum tolerated difference - empirically determined by testing
 
 #define MIN_FREQ		20	//we don't analyze before this index to not use resources for nothing
 #define MAX_FREQ		40	//we don't analyze after this index to not use resources for nothing
@@ -87,10 +87,6 @@ float sound_remote(float* data){
 
 void find_sound(float micro0, float micro1, float micro2)
 {
-	//graphe index
-	static uint16_t i = 0;
-	i++;
-
 	if(micro2 > micro1){ //arrière droite
 		if(micro2 > micro0){
 			if(micro1 > micro0){
@@ -198,7 +194,7 @@ void processAudioData(int16_t *data, uint16_t num_samples){
 
 		doFFT_optimized(FFT_SIZE, micRight_cmplx_input);
 		doFFT_optimized(FFT_SIZE, micLeft_cmplx_input);
-		//doFFT_optimized(FFT_SIZE, micFront_cmplx_input);
+		//doFFT_optimized(FFT_SIZE, micFront_cmplx_input); //we don't need it for our application
 		doFFT_optimized(FFT_SIZE, micBack_cmplx_input);
 
 		/*	Magnitude processing
@@ -210,7 +206,7 @@ void processAudioData(int16_t *data, uint16_t num_samples){
 		*/
 		arm_cmplx_mag_f32(micRight_cmplx_input, micRight_output, FFT_SIZE);
 		arm_cmplx_mag_f32(micLeft_cmplx_input, micLeft_output, FFT_SIZE);
-		//arm_cmplx_mag_f32(micFront_cmplx_input, micFront_output, FFT_SIZE);
+		//arm_cmplx_mag_f32(micFront_cmplx_input, micFront_output, FFT_SIZE); //we don't need it for our application
 		arm_cmplx_mag_f32(micBack_cmplx_input, micBack_output, FFT_SIZE);
 
 		//sends only one FFT result over 10 for 1 mic to not flood the computer
