@@ -27,6 +27,8 @@ float get_speed_left(void);
 uint8_t get_state(void);
 uint16_t get_frequency(void);
 
+float sound_remote(float* data);
+void find_sound(float micro0, float micro1, float micro2);
 void processAudioData(int16_t *data, uint16_t num_samples);
 
 /*

@@ -1,3 +1,9 @@
+/*
+ * distance.h
+ *
+ *  Created on: 22 avr. 2021
+ *      Author: Jessica, Joel
+ */
 #ifndef DISTANCE_H
 #define DISTANCE_H
 

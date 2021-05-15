@@ -121,7 +121,7 @@ int main(void)
         //waits until a result must be sent to the computer
         wait_send_to_computer();
 #else
-        /* moteur controls */
+        /* motor controls */
         int state = get_state();
         //if we are close to an obstacle: moving forward is not permissible, but turning around is permissible
         if(get_stop() && (state == FRONT_LEFT || state == FRONT_RIGHT)){
@@ -133,28 +133,28 @@ int main(void)
         	right_motor_set_speed(get_speed_right());
         }
 
-        /* commande aux leds */
+        /* LED controls */
         uint8_t color = color_convertion(get_frequency());
         if(state == BACK_RIGHT){
-        	//on passe du vert au jaune
+        	// go from green to yellow
         	clear_leds();
         	toggle_rgb_led(LED4, GREEN_LED, MAX_COLOR);
         	toggle_rgb_led(LED4, RED_LED, color);
         }
         else if(state == BACK_LEFT){
-        	//on passe du rouge au rose
+        	// from red to pink
         	clear_leds();
         	toggle_rgb_led(LED6, RED_LED, MAX_COLOR);
         	toggle_rgb_led(LED6, BLUE_LED, color);
         }
         else if(state == FRONT_RIGHT){
-        	//on passe bleu foncé au bleu clair
+        	// blue to pink
         	clear_leds();
         	toggle_rgb_led(LED8, BLUE_LED, MAX_COLOR);
         	toggle_rgb_led(LED8, RED_LED, color);
         }
         else if(state == FRONT_LEFT){
-        	//on passe du rouge au jaune
+        	// red to yellow
         	clear_leds();
         	toggle_rgb_led(LED2, RED_LED, MAX_COLOR);
         	toggle_rgb_led(LED2, GREEN_LED, color);
