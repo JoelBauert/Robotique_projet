@@ -22,7 +22,7 @@
 #define FL_49 6 // front left 49'
 #define FL_17 7 // front right 17'
 
-#define THRESHOLD_DIST 200 //distance at which the e-puck should stop
+#define THRESHOLD_DIST 200 //distance at which the e-puck should stop - empirically determined by testing
 
 static uint8_t stop; //boolean value to signal that an obstacle is close
 
@@ -32,7 +32,8 @@ uint8_t get_stop(void)
 }
 
 /*
- * @brief: function to check the 4 front facing proximity sensors and set the stop boolean if the e-puck is close to an obstacle
+ * @brief: function to check the 4 front facing proximity sensors and set the stop boolean
+ * if the e-puck is close to an obstacle
  */
 void find_distance(void)
 {
